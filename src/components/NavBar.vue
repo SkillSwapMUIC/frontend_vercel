@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar">
     <router-link to="/" class="navbar-brand logo">
-      SkillSwap
+      <img src="/src/components/HomePage/logo.png" alt="SkillSwap Logo" class="logo-img" />
     </router-link>
     <div class="navbar-search">
       <input
@@ -37,9 +37,7 @@ export default {
 };
 </script>
 
-
 <style scoped>
-
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -71,10 +69,8 @@ body {
   border: 1px solid #ccc;
 }
 
-
-.navbar .logo {
-  font-weight: bold;
-  color: #535bf2;
+.navbar .logo-img {
+  height: 30px;
 }
 
 .navbar-links ul {
@@ -149,5 +145,4 @@ body {
     margin: 10px 0;
   }
 }
-
 </style>
