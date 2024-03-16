@@ -10,19 +10,31 @@
 </template>
 
 <script>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
 export default {
   name: 'QuestionBox',
-  data() {
-    return {
-      question: '',
+  setup() {
+    const router = useRouter();
+    const question = ref('');
+
+    const submitQuestion = () => {
+      if (question.value.trim()) {
+        router.push({
+          name: 'Discussion',
+          params: { questionTitle: question.value }
+        });
+        question.value = '';
+      } else {
+        alert('Please enter a question title.');
+      }
     };
-  },
-  methods: {
-    submitQuestion() {
-      console.log(this.question);
-      alert(`Question Submitted: ${this.question}`);
-      this.question = '';
-    },
+
+    return {
+      question,
+      submitQuestion,
+    };
   },
 };
 </script>
