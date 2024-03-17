@@ -14,6 +14,7 @@
     <div class="navbar-links">
       <ul>
         <li><router-link to="/login" class="btn btn-login">Login</router-link></li>
+        <router-link to="/teachers-dashboard" class="btn btn-teachers">Teachers Dashboard</router-link>
       </ul>
     </div>
   </nav>
@@ -118,12 +119,12 @@ body {
   background-color: #007bff;
 }
 
-.btn-signup {
+.btn-teachers {
   background-color: #5a5a5a;
   color: white;
 }
 
-.btn-signup:hover {
+.btn-teachers:hover {
   background-color: darkgray;
 }
 
