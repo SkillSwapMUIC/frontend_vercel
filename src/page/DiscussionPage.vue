@@ -1,33 +1,38 @@
 <template>
   <div class="discussion-page">
-    <div class="question">
-      <h1 class="question-title">{{ question.title }}</h1>
-      <div v-if="question.content || question.imageUrl">
-        <p class="question-content" v-if="question.content">{{ question.content }}</p>
-        <img :src="question.imageUrl" alt="Uploaded image" v-if="question.imageUrl">
-      </div>
-      <div v-else>
-        <textarea v-model="editableContent" placeholder="Provide more information on the question..." class="content-textarea"></textarea>
-
-        <label for="image-upload" class="image-upload-label">Upload Image:</label>
-        <input type="file" id="image-upload" @change="handleImageUpload">
-
-        <button @click="saveContent" class="save-content-button">Save Content</button>
-      </div>
+    <div class="title-and-subject">
+      <textarea class="question-title" readonly>{{ question.title }}</textarea>
+      <select v-model="selectedSubject" class="subject-selector">
+        <option disabled value="">Select subject</option>
+        <option v-for="subject in subjects" :key="subject" :value="subject">{{ subject }}</option>
+      </select>
     </div>
 
-    <div class="add-answer">
-      <textarea v-model="newAnswer" placeholder="Add your answer here..."></textarea>
-      <button @click="submitAnswer">Submit Answer</button>
+    <div v-if="question.content || question.imageUrl">
+      <p class="question-content">{{ question.content }}</p>
+      <img v-if="question.imageUrl" :src="question.imageUrl" alt="Uploaded image" class="uploaded-image">
+    </div>
+    <div v-else class="question-details">
+      <textarea v-model="editableContent" class="content-textarea" placeholder="Provide more information on the question..."></textarea>
+      <div class="image-upload-section">
+        <label for="image-upload" class="image-upload-label">Upload Image:</label>
+        <input id="image-upload" type="file" @change="handleImageUpload" class="image-upload">
+      </div>
+      <button @click="saveContent" class="save-content-button">Save Content</button>
+    </div>
+
+    <div class="add-answer-section">
+      <textarea class="answer-textarea" v-model="newAnswer" placeholder="Add your answer here..."></textarea>
+      <button class="submit-answer-btn" @click="submitAnswer">Submit Answer</button>
     </div>
 
     <div class="answers">
       <h2>Answers</h2>
       <div class="answer" v-for="answer in question.answers" :key="answer.id">
-        <p>{{ answer.text }}</p>
+        <p class="answer text-wrap">{{ answer.text }}</p>
         <div class="comments">
           <div class="comment" v-for="comment in answer.comments" :key="comment.id">
-            <p>{{ comment.text }}</p>
+            <p class="comment text-wrap">{{ comment.text }}</p>
           </div>
           <div class="add-comment">
             <textarea v-model="newComments[answer.id]" placeholder="Add a comment..."></textarea>
@@ -45,6 +50,8 @@ import { useRoute } from 'vue-router';
 
 export default {
   setup() {
+    const subjects = ['Math', 'Programming', 'Science'];
+    const selectedSubject = ref(subjects[0]);
     const route = useRoute();
     const editableContent = ref('');
     const question = ref({
@@ -104,6 +111,8 @@ export default {
     };
 
     return {
+      subjects,
+      selectedSubject,
       question,
       editableContent,
       newAnswer,
@@ -124,64 +133,124 @@ export default {
   max-width: 800px;
 }
 
-.question-title, .answers h2 {
+.title-and-subject {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.question-title {
+  flex-grow: 1;
+  margin-top: 10px;
+  background: none;
+  border: none;
   font-size: 2rem;
+  text-align: center;
+  resize: none;
+}
+
+.subject-selector {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.question-details {
+  margin-bottom: 1rem;
+}
+
+.content-textarea {
+  width: 100%;
+  min-height: 150px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   margin-bottom: 0.5rem;
 }
 
-.question-content, .answer p, .comment p {
-  margin-bottom: 2rem;
-  word-wrap: break-word;
+.image-upload-section {
+  margin-bottom: 1rem;
 }
 
-.answers, .answer, .comments, .add-comment {
+.image-upload {
+  border: 1px solid #ccc;
+  display: block;
+}
+
+.save-content-button {
+  padding: 0.5rem 1rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.save-content-button:hover {
+  background-color: #45a049;
+}
+
+.answer-textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.submit-answer-btn {
+  padding: 0.5rem 1rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-answer-btn:hover {
+  background-color: #45a049;
+}
+
+.answers {
   margin-top: 1rem;
 }
 
-.answer, .comment {
+.answer {
   background-color: #f0f0f0;
   padding: 1rem;
   margin-bottom: 1rem;
   border-radius: 4px;
 }
 
-.add-comment {
-  max-width: 100%;
+.comments {
+  margin-top: 1rem;
+  padding-left: 1rem;
 }
 
-.add-comment textarea {
-  width: 100%;
-  max-width: 100%;
-  margin-bottom: 0.5rem;
-  height: 100px;
-}
-
-.add-comment button {
-  display: block;
-  width: auto;
-  padding: 8px 16px;
-}
-
-.add-answer {
-  margin-top: 20px;
-}
-
-.add-answer textarea,
-.add-comment textarea {
-  width: 100%;
-  margin-bottom: 0.5rem;
-  min-height: 100px;
+.comment {
+  background-color: #e8e8e8;
   padding: 0.5rem;
-  border: 1px solid #ccc;
+  margin-top: 0.5rem;
   border-radius: 4px;
 }
 
-.add-answer button,
+.add-comment {
+  margin-top: 1rem;
+}
+
+.add-comment textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  min-height: 80px;
+}
+
 .add-comment button {
-  display: block;
-  width: auto;
-  padding: 8px 16px;
-  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
   background-color: #4CAF50;
   color: white;
   border: none;
@@ -189,37 +258,13 @@ export default {
   cursor: pointer;
 }
 
-.add-answer button:hover,
 .add-comment button:hover {
   background-color: #45a049;
 }
 
-.content-textarea {
-  width: 100%;
-  height: 200px;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.text-wrap {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
-.image-upload-label {
-  display: block;
-  margin-bottom: 0.5rem;
-}
-
-.save-content-button {
-  display: inline-block;
-  padding: 8px 16px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 1rem;
-}
-
-.save-content-button:hover {
-  background-color: #45a049;
-}
 </style>
