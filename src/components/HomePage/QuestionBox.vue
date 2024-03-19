@@ -22,7 +22,7 @@ export default {
     const submitQuestion = () => {
       if (question.value.trim()) {
         router.push({
-          name: 'Discussion',
+          name: 'CreateQuestion',
           params: { questionTitle: question.value }
         });
         question.value = '';

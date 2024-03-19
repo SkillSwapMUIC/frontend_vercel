@@ -1,124 +1,91 @@
 <template>
   <div class="discussion-page">
-    <div class="title-and-subject">
-      <textarea class="question-title" readonly>{{ question.title }}</textarea>
-      <select v-model="selectedSubject" class="subject-selector">
-        <option disabled value="">Select subject</option>
-        <option v-for="subject in subjects" :key="subject" :value="subject">{{ subject }}</option>
-      </select>
+    <div class="question-header">
+      <h1 class="question-title">{{ question.title }}</h1>
+      <h2 class="question-subject">Subject: {{ question.subject }}</h2>
+      <img v-if="question.imageUrl" :src="question.imageUrl" alt="Question image" class="uploaded-image">
     </div>
 
-    <div v-if="question.content || question.imageUrl">
+    <div class="question-content-box">
       <p class="question-content">{{ question.content }}</p>
-      <img v-if="question.imageUrl" :src="question.imageUrl" alt="Uploaded image" class="uploaded-image">
     </div>
-    <div v-else class="question-details">
-      <textarea v-model="editableContent" class="content-textarea" placeholder="Provide more information on the question..."></textarea>
-      <div class="image-upload-section">
-        <label for="image-upload" class="image-upload-label">Upload Image:</label>
-        <input id="image-upload" type="file" @change="handleImageUpload" class="image-upload">
+
+      <div class="add-answer-section">
+        <textarea class="answer-textarea" v-model="newAnswer" placeholder="Add your answer here..."></textarea>
+        <button class="submit-answer-btn" @click="submitAnswer">Submit Answer</button>
       </div>
-      <button @click="saveContent" class="save-content-button">Save Content</button>
-    </div>
 
-    <div class="add-answer-section">
-      <textarea class="answer-textarea" v-model="newAnswer" placeholder="Add your answer here..."></textarea>
-      <button class="submit-answer-btn" @click="submitAnswer">Submit Answer</button>
-    </div>
-
-    <div class="answers">
-      <h2>Answers</h2>
-      <div class="answer" v-for="answer in question.answers" :key="answer.id">
-        <p class="answer text-wrap">{{ answer.text }}</p>
-        <div class="comments">
-          <div class="comment" v-for="comment in answer.comments" :key="comment.id">
-            <p class="comment text-wrap">{{ comment.text }}</p>
-          </div>
-          <div class="add-comment">
-            <textarea v-model="newComments[answer.id]" placeholder="Add a comment..."></textarea>
-            <button @click="submitComment(answer.id)">Submit Comment</button>
+      <div class="answers">
+        <h2>Answers</h2>
+        <div class="answer" v-for="answer in question.answers" :key="answer.id">
+          <p>{{ answer.text }}</p>
+          <div class="comments">
+            <div class="comment" v-for="comment in answer.comments" :key="comment.id">
+              <p>{{ comment.text }}</p>
+            </div>
+            <div class="add-comment">
+              <textarea v-model="newComments[answer.id]" placeholder="Add a comment..."></textarea>
+              <button @click="submitComment(answer.id)">Submit Comment</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</template>
+  </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 export default {
   setup() {
-    const subjects = ['Math', 'Programming', 'Science'];
-    const selectedSubject = ref(subjects[0]);
     const route = useRoute();
-    const editableContent = ref('');
     const question = ref({
-      title: route.params.questionTitle || 'Default Question Title',
-      content: '',
-      imageUrl: '',
+      title: route.params.questionTitle,
+      subject: route.params.questionSubject,
+      content: route.params.questionContent,
+      imageUrl: route.params.questionImage,
       answers: [],
     });
     const newAnswer = ref('');
     const newComments = ref({});
 
-    const handleImageUpload = event => {
-      const file = event.target.files[0];
-      if (file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          question.value.imageUrl = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      } else {
-        alert('Please upload an image file.');
-      }
-    };
+    onMounted(() => {
+      question.value.subject = route.params.questionSubject || 'Default Subject';
+      question.value.content = route.params.questionContent || 'No additional information provided.';
+      question.value.imageUrl = route.params.questionImage || '';
+    });
 
-    const saveContent = () => {
-      question.value.content = editableContent.value;
-    };
 
     const submitAnswer = () => {
       if (newAnswer.value.trim()) {
-        const newId = question.value.answers.length + 1;
         question.value.answers.push({
-          id: newId,
+          id: Date.now(),
           text: newAnswer.value,
           comments: [],
         });
         newAnswer.value = '';
-      } else {
-        alert('Please enter an answer.');
       }
     };
 
-    const submitComment = answerId => {
+    const submitComment = (answerId) => {
       const commentText = newComments.value[answerId];
       if (commentText && commentText.trim()) {
-        const answerIndex = question.value.answers.findIndex(a => a.id === answerId);
-        if (answerIndex !== -1) {
-          question.value.answers[answerIndex].comments.push({
-            id: question.value.answers[answerIndex].comments.length + 1,
+        const answer = question.value.answers.find(a => a.id === answerId);
+        if (answer) {
+          answer.comments.push({
+            id: Date.now(),
             text: commentText,
           });
           newComments.value[answerId] = '';
         }
-      } else {
-        alert('Please enter a comment.');
       }
     };
 
     return {
-      subjects,
-      selectedSubject,
       question,
-      editableContent,
       newAnswer,
       newComments,
-      saveContent,
-      handleImageUpload,
       submitAnswer,
       submitComment,
     };
@@ -126,145 +93,120 @@ export default {
 };
 </script>
 
-<style scoped>
-.discussion-page {
-  margin: 2rem auto;
-  padding: 1rem;
-  max-width: 800px;
-}
+  <style scoped>
+    .discussion-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+      max-width: 100%;
+    }
 
-.title-and-subject {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
+    .question-header, .question-title, .question-subject, .question-content {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      text-align: center;
+      width: 100%;
+    }
 
-.question-title {
-  flex-grow: 1;
-  margin-top: 10px;
-  background: none;
-  border: none;
-  font-size: 2rem;
-  text-align: center;
-  resize: none;
-}
+    .uploaded-image {
+      max-width: 100%;
+      height: auto;
+      margin: 1rem 0;
+    }
 
-.subject-selector {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
+    .answer-textarea, .add-comment textarea {
+      width: 100%;
+      min-height: 120px;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
+    }
 
-.question-details {
-  margin-bottom: 1rem;
-}
+    .submit-answer-btn, .add-comment button {
+      padding: 0.5rem 1rem;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
 
-.content-textarea {
-  width: 100%;
-  min-height: 150px;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
-}
+    .submit-answer-btn:hover, .add-comment button:hover {
+      background-color: #45a049;
+    }
 
-.image-upload-section {
-  margin-bottom: 1rem;
-}
+    .answers {
+      width: 100%;
+    }
 
-.image-upload {
-  border: 1px solid #ccc;
-  display: block;
-}
+    .answer {
+      background-color: #f0f0f0;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
 
-.save-content-button {
-  padding: 0.5rem 1rem;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
+    .comments {
+      margin-top: 1rem;
+      padding-left: 1rem;
+    }
 
-.save-content-button:hover {
-  background-color: #45a049;
-}
+    .comment {
+      background-color: #e8e8e8;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      border-radius: 4px;
+    }
 
-.answer-textarea {
-  width: 100%;
-  min-height: 200px;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
-}
+    .answer, .comment {
+      background-color: #f0f0f0;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
 
-.submit-answer-btn {
-  padding: 0.5rem 1rem;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
+    .add-comment {
+      margin-top: 1rem;
+    }
 
-.submit-answer-btn:hover {
-  background-color: #45a049;
-}
+    .add-comment textarea {
+      min-height: 80px;
+    }
 
-.answers {
-  margin-top: 1rem;
-}
+    .question-title {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
 
-.answer {
-  background-color: #f0f0f0;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 4px;
-}
+    .question-subject {
+      margin-bottom: 1rem;
+    }
 
-.comments {
-  margin-top: 1rem;
-  padding-left: 1rem;
-}
+    .question-content-box {
+      margin-bottom: 1rem;
+    }
 
-.comment {
-  background-color: #e8e8e8;
-  padding: 0.5rem;
-  margin-top: 0.5rem;
-  border-radius: 4px;
-}
+    .question-content {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
 
-.add-comment {
-  margin-top: 1rem;
-}
+    .text-wrap {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
 
-.add-comment textarea {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
-  min-height: 80px;
-}
+    .answer p, .comment p, .question-title, .question-content, .question-subject {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
 
-.add-comment button {
-  padding: 0.5rem 1rem;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.add-comment button:hover {
-  background-color: #45a049;
-}
-
-.text-wrap {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-</style>
+  </style>

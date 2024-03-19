@@ -2,14 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router';
 import LoginPage from '/src/ServicePage/LoginPage.vue';
 import HomePage from "/src/page/HomePage.vue";
 import DiscussionPage from "/src/page/DiscussionPage.vue";
-import TeachersDashboard from '/src/components/TeachersDashboard.vue'; 
+import TeachersDashboard from '/src/components/TeachersDashboard.vue';
+import CreateQuestionPage from "/src/page/CreateQuestionPage.vue";
 
 const routes = [
     { path: '/', name: 'Home', component: HomePage },
     { path: '/login', component: LoginPage },
     { path: '/discussion/:questionTitle', name: 'Discussion', component: DiscussionPage, props: true },
-    { path: '/teachers-dashboard', component: TeachersDashboard } 
-    
+    { path: '/teachers-dashboard', component: TeachersDashboard },
+    {path: '/create-question/:questionTitle', name: 'CreateQuestion', component: CreateQuestionPage,props: true}
 ];
 
 const router = createRouter({
