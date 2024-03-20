@@ -1,17 +1,24 @@
 <template>
   <div class="create-question-page">
     <div class="title-and-subject">
-      <textarea v-model="question.title" class="question-title-input" placeholder="Question Title"></textarea>
+      <textarea v-model="question.title" class="question-title-input" placeholder="Enter Question Title"></textarea>
       <select v-model="selectedSubject" class="subject-selector">
-        <option disabled value="">Select subject</option>
+        <option disabled value="">Select Subject</option>
         <option v-for="subject in subjects" :key="subject" :value="subject">{{ subject }}</option>
       </select>
     </div>
 
     <div class="question-details">
       <textarea v-model="editableContent" class="content-textarea" placeholder="Provide more information on the question..."></textarea>
-      <label for="image-upload" class="image-upload-label">Upload Image:</label>
-      <input id="image-upload" type="file" @change="handleImageUpload" class="image-upload">
+      <div class="image-upload-container">
+        <label for="image-upload" class="image-upload-label">
+          <span>Upload Image</span>
+          <input id="image-upload" type="file" @change="handleImageUpload" class="image-upload">
+        </label>
+        <div v-if="question.imageUrl" class="image-preview">
+          <img :src="question.imageUrl" alt="Uploaded Image" />
+        </div>
+      </div>
 
       <button @click="saveContent" class="save-content-button">Save Content</button>
     </div>
@@ -80,13 +87,16 @@ export default {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  border: 1px solid #ccc; /* Add border line */
+  background-color: #f7f7f7; /* Light shade color */
+  padding: 20px; /* Add padding */
 }
 
 .title-and-subject {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
+  width: 80%; /* Adjusted width */
   margin-bottom: 2rem;
 }
 
@@ -95,22 +105,22 @@ export default {
   padding: 1rem;
   font-size: 2rem;
   margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: none; /* Remove border */
+  border-radius: 8px;
   resize: vertical;
 }
 
 .subject-selector {
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 50%;
+  border: none; /* Remove border */
+  border-radius: 8px;
+  width: 100%; /* Adjusted width */
 }
 
 .question-details {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 80%; /* Adjusted width */
   align-items: center;
 }
 
@@ -119,20 +129,39 @@ export default {
   min-height: 150px;
   padding: 1rem;
   margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: none; /* Remove border */
+  border-radius: 8px;
   resize: vertical;
 }
 
 .image-upload-label {
-  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 1rem;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+}
+
+.image-upload-label:hover {
+  border-color: #4CAF50;
 }
 
 .image-upload {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 50%;
+  display: none;
+}
+
+.image-preview {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
 }
 
 .save-content-button {
@@ -140,23 +169,14 @@ export default {
   background-color: #4CAF50;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   width: auto;
   margin-top: 2rem;
+  transition: background-color 0.3s ease;
 }
 
 .save-content-button:hover {
   background-color: #45a049;
-}
-
-@media (max-width: 768px) {
-  .subject-selector {
-    width: 100%;
-}
-
-.image-upload {
-width: 100%;
-  }
 }
 </style>

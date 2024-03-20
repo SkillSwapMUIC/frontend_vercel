@@ -10,28 +10,28 @@
       <p class="question-content">{{ question.content }}</p>
     </div>
 
-      <div class="add-answer-section">
-        <textarea class="answer-textarea" v-model="newAnswer" placeholder="Add your answer here..."></textarea>
-        <button class="submit-answer-btn" @click="submitAnswer">Submit Answer</button>
-      </div>
+    <div class="add-answer-section">
+      <textarea class="answer-textarea" v-model="newAnswer" placeholder="Add your answer here..."></textarea>
+      <button class="submit-answer-btn" @click="submitAnswer">Submit Answer</button>
+    </div>
 
-      <div class="answers">
-        <h2>Answers</h2>
-        <div class="answer" v-for="answer in question.answers" :key="answer.id">
-          <p>{{ answer.text }}</p>
-          <div class="comments">
-            <div class="comment" v-for="comment in answer.comments" :key="comment.id">
-              <p>{{ comment.text }}</p>
-            </div>
-            <div class="add-comment">
-              <textarea v-model="newComments[answer.id]" placeholder="Add a comment..."></textarea>
-              <button @click="submitComment(answer.id)">Submit Comment</button>
-            </div>
+    <div class="answers">
+      <h2>Answers</h2>
+      <div class="answer" v-for="answer in question.answers" :key="answer.id">
+        <p>{{ answer.text }}</p>
+        <div class="comments">
+          <div class="comment" v-for="comment in answer.comments" :key="comment.id">
+            <p>{{ comment.text }}</p>
+          </div>
+          <div class="add-comment">
+            <textarea v-model="newComments[answer.id]" placeholder="Add a comment..."></textarea>
+            <button @click="submitComment(answer.id)">Submit Comment</button>
           </div>
         </div>
       </div>
     </div>
-  </template>
+  </div>
+</template>
 
 <script>
 import { ref, onMounted } from 'vue';
@@ -93,120 +93,103 @@ export default {
 };
 </script>
 
-  <style scoped>
-    .discussion-page {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
-      max-width: 100%;
-    }
+<style scoped>
+  .discussion-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    max-width: 100%;
+  }
 
-    .question-header, .question-title, .question-subject, .question-content {
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      text-align: center;
-      width: 100%;
-    }
+  .question-header, .question-title, .question-subject, .question-content {
+    text-align: center;
+    width: 100%;
+  }
 
-    .uploaded-image {
-      max-width: 100%;
-      height: auto;
-      margin: 1rem 0;
-    }
+  .uploaded-image {
+    max-width: 100%;
+    height: auto;
+    margin: 1rem 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
 
-    .answer-textarea, .add-comment textarea {
-      width: 100%;
-      min-height: 120px;
-      margin-bottom: 1rem;
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      resize: vertical;
-    }
+  .answer-textarea, .add-comment textarea {
+    width: 100%;
+    min-height: 120px;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+  }
 
-    .submit-answer-btn, .add-comment button {
-      padding: 0.5rem 1rem;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 0.5rem;
-    }
+  .submit-answer-btn, .add-comment button {
+    padding: 0.5rem 1rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: background-color 0.3s ease;
+  }
 
-    .submit-answer-btn:hover, .add-comment button:hover {
-      background-color: #45a049;
-    }
+  .submit-answer-btn:hover, .add-comment button:hover {
+    background-color: #45a049;
+  }
 
-    .answers {
-      width: 100%;
-    }
+  .answers {
+    width: 100%;
+  }
 
-    .answer {
-      background-color: #f0f0f0;
-      padding: 1rem;
-      border-radius: 4px;
-      margin-bottom: 1rem;
-    }
+  .answer {
+    background-color: #f0f0f0;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
 
-    .comments {
-      margin-top: 1rem;
-      padding-left: 1rem;
-    }
+  .comments {
+    margin-top: 1rem;
+    padding-left: 1rem;
+  }
 
-    .comment {
-      background-color: #e8e8e8;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-      border-radius: 4px;
-    }
+  .comment {
+    background-color: #e8e8e8;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
 
-    .answer, .comment {
-      background-color: #f0f0f0;
-      padding: 1rem;
-      border-radius: 4px;
-      margin-bottom: 1rem;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-    }
+  .add-comment {
+    margin-top: 1rem;
+  }
 
-    .add-comment {
-      margin-top: 1rem;
-    }
+  .add-comment textarea {
+    min-height: 80px;
+  }
 
-    .add-comment textarea {
-      min-height: 80px;
-    }
+  .question-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #333;
+  }
 
-    .question-title {
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
+  .question-subject {
+    margin-bottom: 1rem;
+    color: #666;
+  }
 
-    .question-subject {
-      margin-bottom: 1rem;
-    }
+  .question-content-box {
+    margin-bottom: 1rem;
+  }
 
-    .question-content-box {
-      margin-bottom: 1rem;
-    }
+  .question-content {
+    color: #333;
+  }
 
-    .question-content {
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-    }
-
-    .text-wrap {
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-    }
-
-    .answer p, .comment p, .question-title, .question-content, .question-subject {
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-    }
-
-  </style>
+</style>
