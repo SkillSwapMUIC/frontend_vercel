@@ -27,17 +27,19 @@
 
 <script>
 import { ref } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
 
 export default {
   setup() {
     const router = useRouter();
-    const route = useRoute();
     const subjects = ['Math', 'Programming', 'Science'];
     const selectedSubject = ref('');
     const editableContent = ref('');
+    const isLoading = ref(false);
+    const errorMessage = ref('');
     const question = ref({
-      title: route.params.questionTitle || '',
+      title: '',
       content: '',
       imageUrl: '',
     });
@@ -56,16 +58,29 @@ export default {
     };
 
     const saveContent = () => {
-      question.value.content = editableContent.value;
-      router.push({
-        name: 'Discussion',
-        params: {
-          questionTitle: question.value.title,
-          questionContent: question.value.content,
-          questionSubject: selectedSubject.value,
-          questionImage: question.value.imageUrl,
-        },
-      });
+      if (!selectedSubject.value || !question.value.title.trim()) {
+        alert('Please fill in all the fields.');
+        return;
+      }
+      isLoading.value = true;
+      axios.post('/api/questions', {
+        title: question.value.title,
+        content: editableContent.value,
+        subject: selectedSubject.value,
+        imageUrl: question.value.imageUrl,
+      })
+          .then(response => {
+            isLoading.value = false;
+            router.push({
+              name: 'Discussion',
+              params: response.data,
+            });
+          })
+          .catch(error => {
+            isLoading.value = false;
+            console.error('There was an error saving the question:', error);
+            errorMessage.value = 'Failed to save the question. Please try again.';
+          });
     };
 
     return {
@@ -75,10 +90,13 @@ export default {
       editableContent,
       handleImageUpload,
       saveContent,
+      isLoading,
+      errorMessage,
     };
   },
 };
 </script>
+
 
 <style scoped>
 .create-question-page {

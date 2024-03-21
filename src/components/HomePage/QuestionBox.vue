@@ -11,23 +11,33 @@
 
 <script>
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import axios from 'axios';
+import router from "/src/router/index.js";
 
 export default {
   name: 'QuestionBox',
   setup() {
-    const router = useRouter();
     const question = ref('');
 
     const submitQuestion = () => {
-      if (question.value.trim()) {
-        router.push({
-          name: 'CreateQuestion',
-          params: { questionTitle: question.value }
-        });
-        question.value = '';
+      const trimmedQuestion = question.value.trim();
+      if (trimmedQuestion) {
+        axios.post('/api/question/create', trimmedQuestion, {
+          headers: {
+            'Content-Type': 'text/plain',
+            'Accept': 'text/plain'
+          }
+        })
+            .then(response => {
+              console.log('Question submitted successfully:', response.data);
+              router.push({ name: 'CreateQuestion', params: { id: response.data }});
+            })
+            .catch(error => {
+              console.error('There was an error submitting the question:', error);
+              alert('Error submitting question. Please try again.');
+            });
       } else {
-        alert('Please enter a question title.');
+        alert('Please enter a question.');
       }
     };
 

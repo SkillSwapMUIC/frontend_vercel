@@ -36,50 +36,76 @@
 <script>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import axios from 'axios';
 
 export default {
   setup() {
     const route = useRoute();
-    const question = ref({
-      title: route.params.questionTitle,
-      subject: route.params.questionSubject,
-      content: route.params.questionContent,
-      imageUrl: route.params.questionImage,
-      answers: [],
-    });
+    const question = ref(null);
     const newAnswer = ref('');
     const newComments = ref({});
+    const loading = ref(false);
+    const errorMessage = ref('');
 
-    onMounted(() => {
-      question.value.subject = route.params.questionSubject || 'Default Subject';
-      question.value.content = route.params.questionContent || 'No additional information provided.';
-      question.value.imageUrl = route.params.questionImage || '';
-    });
+    const fetchQuestionDetails = () => {
+      const questionId = route.params.id;
+      loading.value = true;
+      errorMessage.value = '';
 
+      axios.get(`/api/questions/${questionId}`)
+          .then(response => {
+            question.value = response.data;
+          })
+          .catch(error => {
+            console.error('Error fetching question details:', error);
+            errorMessage.value = 'Failed to load question details.';
+          })
+          .finally(() => {
+            loading.value = false;
+          });
+    };
+
+    onMounted(fetchQuestionDetails);
 
     const submitAnswer = () => {
-      if (newAnswer.value.trim()) {
-        question.value.answers.push({
-          id: Date.now(),
-          text: newAnswer.value,
-          comments: [],
-        });
-        newAnswer.value = '';
-      }
+      loading.value = true;
+      axios.post('/api/answers', {
+        questionId: route.params.id,
+        text: newAnswer.value,
+      })
+          .then(response => {
+            question.value.answers.push(response.data);
+            newAnswer.value = '';
+          })
+          .catch(error => {
+            console.error('Error submitting answer:', error);
+            errorMessage.value = 'Failed to submit answer.';
+          })
+          .finally(() => {
+            loading.value = false;
+          });
     };
 
     const submitComment = (answerId) => {
-      const commentText = newComments.value[answerId];
-      if (commentText && commentText.trim()) {
-        const answer = question.value.answers.find(a => a.id === answerId);
-        if (answer) {
-          answer.comments.push({
-            id: Date.now(),
-            text: commentText,
+      loading.value = true;
+      axios.post('/api/comments', {
+        answerId: answerId,
+        text: newComments.value[answerId],
+      })
+          .then(response => {
+            const answer = question.value.answers.find(a => a.id === answerId);
+            if (answer) {
+              answer.comments.push(response.data);
+              newComments.value[answerId] = '';
+            }
+          })
+          .catch(error => {
+            console.error('Error submitting comment:', error);
+            errorMessage.value = 'Failed to submit comment.';
+          })
+          .finally(() => {
+            loading.value = false;
           });
-          newComments.value[answerId] = '';
-        }
-      }
     };
 
     return {
@@ -88,10 +114,14 @@ export default {
       newComments,
       submitAnswer,
       submitComment,
+      loading,
+      errorMessage,
     };
   },
 };
 </script>
+
+
 
 <style scoped>
   .discussion-page {
