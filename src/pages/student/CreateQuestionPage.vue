@@ -80,6 +80,7 @@ export default {
         content: editableContent.value,
         subject: [selectedSubject.value],
         imageUrl: question.value.imageUrl,
+        user_id: "MockID"
       })
           .then(response => {
             isLoading.value = false;
