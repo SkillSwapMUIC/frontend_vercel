@@ -78,7 +78,7 @@ export default {
       axios.post(backendURL + '/qanda/question/submit', {
         title: question.value.title,
         content: editableContent.value,
-        subject: selectedSubject.value,
+        subject: [selectedSubject.value],
         imageUrl: question.value.imageUrl,
       })
           .then(response => {
