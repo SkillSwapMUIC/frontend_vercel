@@ -52,7 +52,7 @@ export default {
       loading.value = true;
       errorMessage.value = '';
 
-      axios.get(`/api/questions/${questionId}`)
+      axios.get(`/qanda/thread/byid/{question_id}`)
           .then(response => {
             question.value = response.data;
           })
@@ -69,7 +69,7 @@ export default {
 
     const submitAnswer = () => {
       loading.value = true;
-      axios.post('/api/answers', {
+      axios.post('/qanda/question/{question_id}/answer', {
         questionId: route.params.id,
         text: newAnswer.value,
       })
@@ -120,8 +120,6 @@ export default {
   },
 };
 </script>
-
-
 
 <style scoped>
   .discussion-page {

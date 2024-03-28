@@ -22,7 +22,7 @@ export default {
     const submitQuestion = () => {
       const trimmedQuestion = question.value.trim();
       if (trimmedQuestion) {
-        axios.post('/api/question/create', trimmedQuestion, {
+        axios.post('/qanda/question/???', trimmedQuestion, {
           headers: {
             'Content-Type': 'text/plain',
             'Accept': 'text/plain'
@@ -30,7 +30,13 @@ export default {
         })
             .then(response => {
               console.log('Question submitted successfully:', response.data);
-              router.push({ name: 'CreateQuestion', params: { id: response.data }});
+              router.push({
+                name: 'CreateQuestion',
+                params: {
+                  questionId: response.data,
+                  questionTitle: trimmedQuestion
+                }
+              });
             })
             .catch(error => {
               console.error('There was an error submitting the question:', error);

@@ -15,6 +15,7 @@
       <ul>
         <li><router-link to="/login" class="btn btn-login">Login</router-link></li>
         <router-link to="/teachers-dashboard" class="btn btn-teachers">Teachers Dashboard</router-link>
+        <router-link to="/admin" class="button is-light">Admin</router-link>
       </ul>
     </div>
   </nav>

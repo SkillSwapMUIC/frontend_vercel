@@ -26,69 +26,73 @@
 </template>
 
 <script>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
 
 export default {
   setup() {
     const router = useRouter();
-    const subjects = ['Math', 'Programming', 'Science'];
-    const selectedSubject = ref('');
-    const editableContent = ref('');
+    const route = useRoute();
+
+    const title = ref(route.params.questionTitle || '');
+    const content = ref('');
+    const subject = ref('');
+    const imageUrl = ref('');
     const isLoading = ref(false);
     const errorMessage = ref('');
-    const question = ref({
-      title: '',
-      content: '',
-      imageUrl: '',
+
+    const subjects = ref(['Math', 'Programming', 'Science']);
+
+    watch(() => route.params.questionTitle, (newTitle) => {
+      title.value = newTitle;
     });
 
-    const handleImageUpload = (event) => {
-      const file = event.target.files[0];
-      if (file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          question.value.imageUrl = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      } else {
-        alert('Please upload an image file.');
-      }
-    };
+    // const handleImageUpload = async (event) => {
+    //   const file = event.target.files[0];
+    //   if (file && file.type.startsWith('image/')) {
+    //     try {
+    //       const formData = new FormData();
+    //       formData.append('image', file);
+    //       const response = await axios.post('/api/uploadImage', formData, {
+    //         headers: {
+    //           'Content-Type': 'multipart/form-data',
+    //         },
+    //       });
+    //       imageUrl.value = response.data.imageUrl;
+    //     } catch (error) {
+    //       console.error('Image upload failed:', error);
+    //       alert('Failed to upload image. Please try again.');
+    //     }
+    //   } else {
+    //     alert('Please upload an image file.');
+    //   }
+    // };
 
-    const saveContent = () => {
-      if (!selectedSubject.value || !question.value.title.trim()) {
-        alert('Please fill in all the fields.');
-        return;
-      }
+    const saveContent = async () => {
       isLoading.value = true;
-      axios.post('/api/questions', {
-        title: question.value.title,
-        content: editableContent.value,
-        subject: selectedSubject.value,
-        imageUrl: question.value.imageUrl,
-      })
-          .then(response => {
-            isLoading.value = false;
-            router.push({
-              name: 'Discussion',
-              params: response.data,
-            });
-          })
-          .catch(error => {
-            isLoading.value = false;
-            console.error('There was an error saving the question:', error);
-            errorMessage.value = 'Failed to save the question. Please try again.';
-          });
+      try {
+        const response = await axios.post('/qanda/question/submit', {
+          title: title.value,
+          content: content.value,
+          subject: subject.value,
+          //imageUrl: imageUrl.value,
+        });
+        isLoading.value = false;
+        router.push({ name: 'Discussion', params: { questionId: response.data.id }});
+      } catch (error) {
+        isLoading.value = false;
+        console.error('Failed to save the question:', error);
+        errorMessage.value = 'Failed to save the question. Please try again.';
+      }
     };
 
     return {
+      title,
+      content,
       subjects,
-      selectedSubject,
-      question,
-      editableContent,
-      handleImageUpload,
+      imageUrl,
+      //handleImageUpload,
       saveContent,
       isLoading,
       errorMessage,
@@ -96,7 +100,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .create-question-page {

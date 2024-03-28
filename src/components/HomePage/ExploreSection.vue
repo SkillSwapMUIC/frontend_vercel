@@ -25,7 +25,7 @@ export default {
   },
   methods: {
     fetchQuestions() {
-      axios.get('/api/questions/random?count=6')
+      axios.get('/qanda/getrandomsixtitles/random?count=6')
           .then(response => {
             this.questions = response.data;
           })
