@@ -14,6 +14,7 @@
 <script>
 import axios from 'axios';
 import backendURL from '../config.js';
+import router from "../router.js";
 
 export default {
   name: 'ExploreSection',
@@ -38,7 +39,11 @@ export default {
     },
     viewQuestion(question) {
       console.log("Viewing question:", question);
-      this.$router.push({ name: 'Discussion', params: { id: question.id } });
+      let question_id = question.id
+      router.push({
+        name: 'Discussion',
+        params: { question_id },
+      });
     }
   }
 };
