@@ -8,9 +8,9 @@ import CreateQuestionPage from "/src/pages/student/CreateQuestionPage.vue";
 const routes = [
     { path: '/', name: 'Home', component: HomePage },
     { path: '/login', component: LoginPage },
-    { path: '/discussion/:questionTitle', name: 'Discussion', component: DiscussionPage, props: true },
+    { path: '/discussion/:question_id', name: 'Discussion', component: DiscussionPage, props: true },
     { path: '/teachers-dashboard', component: TeachersDashboard },
-    {path: '/create-question/:questionTitle', name: 'CreateQuestion', component: CreateQuestionPage,props: true}
+    {path: '/create-question', name: 'CreateQuestion', component: CreateQuestionPage,props: true}
 ];
 
 const router = createRouter({

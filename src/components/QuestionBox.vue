@@ -20,10 +20,11 @@ export default {
     const question = ref('');
 
     const submitQuestion = () => {
+      let question_title = question.value;
       if (question.value.trim()) {
         router.push({
           name: 'CreateQuestion',
-          params: { questionTitle: question.value }
+          query: { question_title : question_title }
         });
         question.value = '';
       } else {

@@ -9,35 +9,23 @@
     <question-box></question-box>
   </div>
   <div class="explore-section">
-    <h2>Explore</h2>
-    <div class="questions-list">
-      <div class="question-preview" v-for="question in questions" :key="question.id" @click="viewQuestion(question)">
-        <h3>{{ question.title }}</h3>
-        <p>{{ question.summary }}</p>
-      </div>
-    </div>
+    <ExploreSection></ExploreSection>
   </div>
 </template>
 
 <script>
 import QuestionBox from '/src/components/QuestionBox.vue';
+import ExploreSection from "../components/ExploreSection.vue";
+
 
 export default {
   name: 'HomePage',
   components: {
+    ExploreSection,
     QuestionBox,
   },
   data() {
     return {
-      // mockup
-      questions: [
-        { id: 1, title: 'What is my name?', summary: 'Tell me my name please?' },
-        { id: 2, title: 'Can I sleep?', summary: 'Please let me sleep?' },
-        { id: 3, title: 'How to learn programming?', summary: 'I want to learn programming, any tips?' },
-        { id: 4, title: 'What are the best study techniques?', summary: 'Looking for effective study techniques.' },
-        { id: 5, title: 'How can I manage my time effectively while studying?', summary: 'Looking for tips and techniques to optimize study time and productivity.' },
-        { id: 6, title: 'How to improve concentration?', summary: 'Tips for improving concentration during study sessions.' },
-      ],
     };
   },
   methods: {
