@@ -13,8 +13,7 @@
 
 <script>
 import axios from 'axios';
-import backendURL from '../config.js';
-import router from "../router.js";
+import routes from "../utils/routes_config.js";
 
 export default {
   name: 'ExploreSection',
@@ -28,7 +27,7 @@ export default {
   },
   methods: {
     fetchQuestions() {
-      axios.get(backendURL + '/qanda/getrandomsixtitles')
+      axios.get(routes("get_random_six_titles"))
           .then(response => {
             console.log(response.data)
             this.questions = response.data;

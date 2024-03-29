@@ -29,7 +29,7 @@
 import {onMounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import axios from 'axios';
-import backendURL from '../../config.js';
+import routes from "../../utils/routes_config.js";
 
 
 export default {
@@ -75,10 +75,10 @@ export default {
         return;
       }
       isLoading.value = true;
-      axios.post(backendURL + '/qanda/question/submit', {
+      axios.post(routes("submit_question"), {
         title: question.value.title,
         content: editableContent.value,
-        subject: [selectedSubject.value],
+        subject: selectedSubject.value,
         imageUrl: question.value.imageUrl,
         user_id: "MockID"
       })
