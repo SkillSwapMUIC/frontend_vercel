@@ -37,7 +37,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
-import backendURL from "../../config.js";
+import routes from "../../utils/routes_config.js";
 
 export default {
   setup() {
@@ -63,7 +63,7 @@ export default {
       loading.value = true;
       errorMessage.value = '';
 
-      axios.get(  backendURL + '/qanda/thread/byid/' + question_id)
+      axios.get(  routes("get_thread_by_id") + question_id)
           .then(response => {
             console.log(response.data)
             question.value.title = response.data.title
@@ -81,6 +81,10 @@ export default {
 
     onMounted(fetchQuestionDetails);
 
+
+
+    ////////////////////////////
+    // for later
     const submitAnswer = () => {
       loading.value = true;
       axios.post('/api/answers', {
