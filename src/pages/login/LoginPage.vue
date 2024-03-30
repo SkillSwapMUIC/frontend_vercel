@@ -5,12 +5,13 @@ import {googleOneTap} from "vue3-google-login";
 
 
 
+
 </script>
 
 <template>
   <h1>Hello</h1>
-  <button @click="loginAsStudent">Login as Student</button>
-  <button @click="loginAsTeacher">Login as Teacher</button>
+  <button @click="loginAs('student')">Login as Student</button>
+  <button @click="loginAs('teacher')">Login as Teacher</button>
   <button @click="logout">Logout</button>
 
 
@@ -27,6 +28,10 @@ import {googleOneTap} from "vue3-google-login";
 <script >
 
 import { ref } from 'vue';
+import routes from "../../utils/routes_config.js";
+import {decodeCredential, googleLogout, googleOneTap} from "vue3-google-login";
+import axios from "axios";
+
 
 const showSuccessModal = ref(false);
 const userEmail = ref('');
@@ -35,7 +40,6 @@ const closeModal = () => {
   showSuccessModal.value = false;
 };
 
-import {decodeCredential, googleLogout, googleOneTap} from "vue3-google-login";
 
 const logout = () => {
   googleLogout()
@@ -43,35 +47,46 @@ const logout = () => {
   console.log("User logged out")
 }
 
-const loginAsStudent = () => {
-  login().then((email) => {
-    console.log("Logged in as student with email: ", email);
-    if (email) {
-      userEmail.value = email;
+
+const loginAs = (as_what) => {
+  login().then((login_credentials) => {
+    console.log("Logged in as ",as_what," with email: ", login_credentials.email);
+    console.log(typeof login_credentials)
+    if (login_credentials) {
+      userEmail.value = login_credentials.email;
+
+      login_to_backend(login_credentials);
+
       showSuccessModal.value = true;
     }
   });
 };
 
-const loginAsTeacher = () => {
-  login().then((email) => {
-    console.log("Logged in as teacher with email: ", email);
-    if (email) {
-      userEmail.value = email;
-      showSuccessModal.value = true;
-    }
-  });
+
+const login_to_backend = async (login_credentials) => {
+  // Send the email to the backend
+  console.log(login_credentials);
+  const headers = {
+    'Content-Type': 'application/json'
+  };
+  login_credentials.login_as = "student";
+  const jsonUserData = JSON.stringify(login_credentials);
+  const response = await axios.post(routes("login_to_backend"), jsonUserData, {headers: headers});
+  console.log(response.data);
 };
 
 const login = async () => {
   try {
-    const response = await googleOneTap(); // Wait for the response
-    const userData = decodeCredential(response.credential);
+    const response = await googleOneTap();
+    let userData = decodeCredential(response.credential);
+    const idToken = response.credential;
+    userData.idToken = idToken;
     console.log("User's email:", userData.email);
-    return userData.email; // Return the email
+    // return userData.email; // Return the email
+    return userData;
   } catch (error) {
     console.log("Handle the error", error);
-    return null; // Return null in case of error
+    return null;
   }
 };
 
@@ -80,7 +95,6 @@ const login = async () => {
 
 </script>
 
-<style scoped>
 <style scoped>
   /* Modal styles */
 .modal {
