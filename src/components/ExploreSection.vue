@@ -14,6 +14,7 @@
 <script>
 import axios from 'axios';
 import routes from "../utils/routes_config.js";
+import router from "../utils/router.js"
 
 export default {
   name: 'ExploreSection',

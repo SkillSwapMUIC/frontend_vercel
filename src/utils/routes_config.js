@@ -4,7 +4,8 @@ const defined_routes = {
 
     get_thread_by_id : "/qanda/thread/byid/",
     submit_question : "/qanda/question/submit",
-    get_random_six_titles: "/qanda/getrandomsixtitles"
+    get_random_six_titles: "/qanda/getrandomsixtitles",
+    login_to_backend: "/auth/login",
 }
 
 
