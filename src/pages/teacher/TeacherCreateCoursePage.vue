@@ -94,73 +94,73 @@ export default {
 };
 </script>
 
+
 <style scoped>
-.create-question-page {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  border: 1px solid #ccc; /* Add border line */
-  background-color: #f7f7f7; /* Light shade color */
-  padding: 20px; /* Add padding */
+.create-course-page {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 20px auto;
 }
 
-.title-and-subject {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 80%; /* Adjusted width */
-  margin-bottom: 2rem;
+.title-and-category {
+  text-align: center;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-.question-title-input {
-  width: 100%;
-  padding: 1rem;
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  border: none; /* Remove border */
+.course-title-input {
+  font-size: 20px; 
+  margin-bottom: 10px;
+  color: #333;
+  width: calc(100% - 40px);
+  padding: 12px;
   border-radius: 8px;
+  border: 1px solid #ccc;
   resize: vertical;
 }
 
-.subject-selector {
-  padding: 10px;
-  border: none; /* Remove border */
+.category-selector {
+  font-size: 16px; 
+  margin-bottom: 10px;
+  color: #666;
+  padding: 12px;
   border-radius: 8px;
-  width: 100%; /* Adjusted width */
+  border: 1px solid #ccc;
+  width: calc(100% - 40px);
 }
 
-.question-details {
-  display: flex;
-  flex-direction: column;
-  width: 80%; /* Adjusted width */
-  align-items: center;
+.course-details {
+  margin-top: 20px;
 }
 
 .content-textarea {
-  width: 100%;
-  min-height: 150px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border: none; /* Remove border */
+  font-size: 14px; 
+  line-height: 1.6;
+  padding: 20px;
+  background-color: #fff;
   border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: calc(100% - 40px);
+  min-height: 200px;
   resize: vertical;
+  margin-top: 20px;
+}
+
+.image-upload-container {
+  margin-top: 20px;
+  text-align: center;
 }
 
 .image-upload-label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: inline-block;
   cursor: pointer;
-  padding: 1rem;
+  padding: 12px 20px;
   border: 2px dashed #ccc;
   border-radius: 8px;
   transition: border-color 0.3s ease;
-}
-
-.image-upload-label:hover {
-  border-color: #4CAF50;
 }
 
 .image-upload {
@@ -168,7 +168,7 @@ export default {
 }
 
 .image-preview {
-  margin-top: 1rem;
+  margin-top: 20px;
   text-align: center;
 }
 
@@ -179,14 +179,15 @@ export default {
 }
 
 .save-content-button {
-  padding: 10px 20px;
+  font-size: 14px;
+  padding: 12px 24px;
   background-color: #4CAF50;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   width: auto;
-  margin-top: 2rem;
+  margin-top: 20px;
   transition: background-color 0.3s ease;
 }
 
