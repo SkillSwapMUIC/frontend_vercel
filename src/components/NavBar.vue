@@ -14,8 +14,8 @@
     <div class="navbar-links">
       <ul>
         <li><router-link to="/login" class="btn btn-login">Login</router-link></li>
-        <router-link to="/teachers-dashboard" class="btn btn-teachers">Teachers Dashboard</router-link>
-        <router-link to="/admin" class="button is-light">Admin</router-link>
+        <li><router-link to="/teachers-dashboard" class="btn btn-teachers">Teachers Dashboard</router-link></li>
+        <li><router-link to="/admin" class="btn btn-admin">Admin</router-link></li>
       </ul>
     </div>
   </nav>
@@ -120,17 +120,13 @@ body {
   background-color: #007bff;
 }
 
-.btn-teachers {
-  background-color: #5a5a5a;
+.btn-teachers, .btn-admin {
+  background-color: #3b5998;
   color: white;
 }
 
-.btn-teachers:hover {
-  background-color: darkgray;
-}
-
-.btn-login:hover {
-  background-color: cadetblue;
+.btn-teachers:hover, .btn-admin:hover {
+  background-color: #283d5b;
 }
 
 .navbar-brand {

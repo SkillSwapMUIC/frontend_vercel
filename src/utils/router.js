@@ -6,15 +6,19 @@ import TeachersDashboard from '/src/pages/teacher/TeachersDashboard.vue';
 import CreateQuestionPage from "/src/pages/student/CreateQuestionPage.vue";
 import AdminPage from "/src/pages/admin/AdminPage.vue";
 import TeacherCreateCoursePage from "/src/pages/teacher/TeacherCreateCoursePage.vue";
+// src/pages/login/RegistrationPage.vue
+import RegistrationPage from '/src/pages/login/RegistrationPage.vue';
+
 
 const routes = [
     { path: '/', name: 'Home', component: HomePage },
     { path: '/login', component: LoginPage },
     { path: '/discussion/:question_id', name: 'Discussion', component: DiscussionPage, props: true },
     { path: '/teachers-dashboard', component: TeachersDashboard },
-    {path: '/create-question', name: 'CreateQuestion', component: CreateQuestionPage,props: true},
-    {path: '/admin',name: 'Admin',component:  AdminPage},
-    {path: '/teacher-course',name: 'TeacherCourse',component:  TeacherCreateCoursePage},
+    { path: '/create-question', name: 'CreateQuestion', component: CreateQuestionPage,props: true},
+    { path: '/admin', name: 'Admin', component:  AdminPage},
+    { path: '/teacher-course', name: 'TeacherCourse', component:  TeacherCreateCoursePage},
+    { path: '/register', name: 'Register', component: RegistrationPage }
 ];
 
 const router = createRouter({

@@ -17,7 +17,6 @@
 import QuestionBox from '/src/components/QuestionBox.vue';
 import ExploreSection from "../components/ExploreSection.vue";
 
-
 export default {
   name: 'HomePage',
   components: {
@@ -25,31 +24,34 @@ export default {
     QuestionBox,
   },
   data() {
-    return {
-    };
+    return {}; 
   },
   methods: {
     viewQuestion(question) {
       console.log("Viewing question:", question);
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style>
+<style scoped>
+
 .centered-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 60vh;
+  min-height: 60vh; 
   position: relative;
-  margin-top: 70px; 
+  margin-top: 70px;
+  background-size: cover;
+  background-position: center;
 }
 
 .logo-image {
   margin-top: 20px;
-  max-width: 200px; 
+  max-width: 200px;
+  border-radius: 50%; 
 }
 
 .question-box-container {
@@ -59,7 +61,8 @@ export default {
 .centered-container h1 {
   font-size: 3rem;
   margin-bottom: 0.5em;
-  color: #3b5998; 
+  color: #3b5998;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); 
 }
 
 .centered-container p {
@@ -93,7 +96,7 @@ export default {
 .question-preview h3 {
   font-size: 1.25rem;
   margin-bottom: 0.5rem;
-  color: #3b5998; 
+  color: #3b5998;
 }
 
 .question-preview p {
