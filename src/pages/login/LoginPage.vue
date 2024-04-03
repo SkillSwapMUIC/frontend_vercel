@@ -1,134 +1,137 @@
-<script setup>
-// import {onMounted} from 'vue';
-// onMounted(login)
-import {googleOneTap} from "vue3-google-login";
-
-
-
-
-</script>
-
 <template>
-  <h1>Hello</h1>
-  <button @click="loginAs('student')">Login as Student</button>
-  <button @click="loginAs('teacher')">Login as Teacher</button>
-  <button @click="logout">Logout</button>
+  <div class="login-container">
+    <div class="login-form">
+      <h2>Login and Register</h2>
+      <form @submit.prevent="login">
+        <div class="form-group">
+          <label for="username">Username/Email:</label>
+          <input type="text" id="username" v-model="username" placeholder="Enter username/email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" v-model="password" placeholder="Enter password" required>
+        </div>
+        <button type="submit">Login</button>
+      </form>
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+      <button @click="testSession">Test</button>
 
-
-
-  <div v-if="showSuccessModal" class="modal">
-    <div class="modal-content">
-      <span class="close" @click="closeModal">&times;</span>
-      <p>Successfully logged in, hello {{ userEmail }}</p>
     </div>
   </div>
 </template>
 
-
-<script >
-
-import { ref } from 'vue';
+<script>
 import routes from "../../utils/routes_config.js";
-import {decodeCredential, googleLogout, googleOneTap} from "vue3-google-login";
 import axios from "axios";
+import {store} from "../../utils/store.js";
+import router from "../../utils/router.js";
 
+export default {
+  data() {
+    return {
+      username: '',
+      password: '',
+      errorMessage: ''
+    };
+  },
+  methods: {
+    async login() {
 
-const showSuccessModal = ref(false);
-const userEmail = ref('');
+      try {
+        const response = await axios.post(routes("login_to_backend"), {
+          username: this.username,
+          password: this.password,
+          role: "user"
+        }, {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        });
 
-const closeModal = () => {
-  showSuccessModal.value = false;
-};
+        if (response.status === 200) {
+          let user_token = response.data
+          store.user_token = user_token
+        } else {
+          // Handle login failure
+          this.errorMessage = 'Invalid username or password';
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+        this.errorMessage = 'An error occurred. Please try again later.';
+      }
 
-
-const logout = () => {
-  googleLogout()
-
-  console.log("User logged out")
-}
-
-
-const loginAs = (as_what) => {
-  login().then((login_credentials) => {
-    console.log("Logged in as ",as_what," with email: ", login_credentials.email);
-    console.log(typeof login_credentials)
-    if (login_credentials) {
-      userEmail.value = login_credentials.email;
-
-      login_to_backend(login_credentials);
-
-      showSuccessModal.value = true;
-    }
-  });
-};
-
-
-const login_to_backend = async (login_credentials) => {
-  // Send the email to the backend
-  console.log(login_credentials);
-  const headers = {
-    'Content-Type': 'application/json'
-  };
-  login_credentials.login_as = "student";
-  const jsonUserData = JSON.stringify(login_credentials);
-  const response = await axios.post(routes("login_to_backend"), jsonUserData, {headers: headers});
-  console.log(response.data);
-};
-
-const login = async () => {
-  try {
-    const response = await googleOneTap();
-    let userData = decodeCredential(response.credential);
-    const idToken = response.credential;
-    userData.idToken = idToken;
-    console.log("User's email:", userData.email);
-    // return userData.email; // Return the email
-    return userData;
-  } catch (error) {
-    console.log("Handle the error", error);
-    return null;
+      if (store.user_token) {
+        await router.push({
+          name: 'Home',
+        });
+      }
+    },
   }
+
+
 };
-
-
-
-
 </script>
 
 <style scoped>
-  /* Modal styles */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgb(0, 0, 0);
-  background-color: rgba(0, 0, 0, 0.4);
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f0f0;
 }
 
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
+.login-form {
+  max-width: 450px; /* Adjusted max-width */
+  min-width: 300px;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
 }
 
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
+.login-form h2 {
+  margin-bottom: 30px;
+  color: #333333;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
   font-weight: bold;
+  color: #555555;
 }
 
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dddddd;
+  border-radius: 5px;
+  box-sizing: border-box; /* Ensure padding doesn't affect width */
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.error-message {
+  color: #ff0000;
+  margin-top: 15px;
+  text-align: center;
 }
 </style>
