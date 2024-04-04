@@ -11,7 +11,7 @@
     </div>
 
     <div class="add-answer-section">
-      <textarea class="answer-textarea" v-model="newAnswer.text" placeholder="Add your answer here..."></textarea>
+      <textarea class="answer-textarea" v-model="newAnswer" placeholder="Add your answer here..."></textarea>
       <StarRating v-model="computedRating" />
       <button class="submit-answer-btn" @click="submitAnswer">Submit Answer</button>
     </div>
@@ -71,15 +71,16 @@ export default {
     onMounted(fetchQuestionDetails);
 
     const submitAnswer = () => {
+      let question_id = route.params.question_id
       loading.value = true;
-      axios.post('/api/answers', {
+      axios.post(routes("submit_answer")+ "/" + question_id, {
         questionId: route.params.id,
-        text: newAnswer.value.text,
+        text: newAnswer.value,
         rating: rating.value 
       })
         .then(response => {
           question.value.answers.push(response.data);
-          newAnswer.value.text = '';
+          newAnswer.value = '';
         })
         .catch(error => {
           console.error('Error submitting answer:', error);

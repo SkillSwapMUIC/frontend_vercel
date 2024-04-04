@@ -6,6 +6,7 @@ const defined_routes = {
     submit_question : "/qanda/question/submit",
     get_random_six_titles: "/qanda/getrandomsixtitles",
     login_to_backend: "/auth/login",
+    submit_answer: "/qanda/answer-on",
 }
 
 
