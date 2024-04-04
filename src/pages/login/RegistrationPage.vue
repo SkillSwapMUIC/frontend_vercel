@@ -1,3 +1,5 @@
+import RegistrationPage from '/src/pages/login/RegistrationPage.vue';
+
 <template>
   <div class="login-container">
     <div class="login-form">
@@ -60,10 +62,8 @@ export default {
       }
     },
     navigateToRegistration() {
-  console.log("Navigating to registration page");
-  this.$router.push({ name: 'Register' });
-},
-
+      this.$router.push({ name: 'Register' });
+    },
     async testSession() {
       console.log('Testing session...');
       alert('Session tested!');
@@ -71,8 +71,8 @@ export default {
   }
 };
 </script>
-
-<style scoped>
+  
+  <style scoped>
 .login-container {
   display: flex;
   justify-content: center;
@@ -82,7 +82,7 @@ export default {
 }
 
 .login-form {
-  max-width: 450px; /* Adjusted max-width */
+  max-width: 450px; 
   min-width: 300px;
   padding: 30px;
   border-radius: 8px;
@@ -111,7 +111,7 @@ export default {
   padding: 12px;
   border: 1px solid #dddddd;
   border-radius: 5px;
-  box-sizing: border-box; /* Ensure padding doesn't affect width */
+  box-sizing: border-box; 
 }
 
 button {

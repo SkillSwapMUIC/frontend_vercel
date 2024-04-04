@@ -11,127 +11,99 @@
     </div>
 
     <div class="add-answer-section">
-      <textarea class="answer-textarea" v-model="newAnswer" placeholder="Add your answer here..."></textarea>
+      <textarea class="answer-textarea" v-model="newAnswer.text" placeholder="Add your answer here..."></textarea>
+      <StarRating v-model="computedRating" />
       <button class="submit-answer-btn" @click="submitAnswer">Submit Answer</button>
     </div>
 
     <div class="answers">
       <h2>Answers</h2>
-      <div class="answer" v-for="answer in question.answers" :key="answer.id">
-        <p>{{ answer.text }}</p>
-        <div class="comments">
-          <div class="comment" v-for="comment in answer.comments" :key="comment.id">
-            <p>{{ comment.text }}</p>
-          </div>
-          <div class="add-comment">
-            <textarea v-model="newComments[answer.id]" placeholder="Add a comment..."></textarea>
-            <button @click="submitComment(answer.id)">Submit Comment</button>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import routes from "../../utils/routes_config.js";
+import StarRating from "../../pages/general/StarRating.vue";
 
 export default {
+  components: {
+    StarRating
+  },
   setup() {
     const route = useRoute();
-    const question = ref(
-        {
-          title: '',
-          subject: '',
-          content: '',
-          imageUrl: '',
-          answers: [],
-        }
-    );
+    const question = ref({
+      title: '',
+      subject: '',
+      content: '',
+      imageUrl: '',
+      answers: [],
+    });
     const newAnswer = ref('');
-    const newComments = ref({});
+    const rating = ref(0); 
     const loading = ref(false);
     const errorMessage = ref('');
 
-    const fetchQuestionDetails = () => {
 
+    const fetchQuestionDetails = () => {
       let question_id = route.params.question_id;
-      // const questionId = route.params.id;
       loading.value = true;
       errorMessage.value = '';
 
-      axios.get(  routes("get_thread_by_id") + question_id)
-          .then(response => {
-            console.log(response.data)
-            question.value.title = response.data.title
-            question.value.content = response.data.content
-            question.value.subject = response.data.subject
-          })
-          .catch(error => {
-            console.error('Error fetching question details:', error);
-            errorMessage.value = 'Failed to load question details.';
-          })
-          .finally(() => {
-            loading.value = false;
-          });
+      axios.get(routes("get_thread_by_id") + question_id)
+        .then(response => {
+          question.value.title = response.data.title;
+          question.value.content = response.data.content;
+          question.value.subject = response.data.subject;
+        })
+        .catch(error => {
+          console.error('Error fetching question details:', error);
+          errorMessage.value = 'Failed to load question details.';
+        })
+        .finally(() => {
+          loading.value = false;
+        });
     };
 
     onMounted(fetchQuestionDetails);
 
-
-
-    ////////////////////////////
-    // for later
     const submitAnswer = () => {
       loading.value = true;
       axios.post('/api/answers', {
         questionId: route.params.id,
-        text: newAnswer.value,
+        text: newAnswer.value.text,
+        rating: rating.value 
       })
-          .then(response => {
-            question.value.answers.push(response.data);
-            newAnswer.value = '';
-          })
-          .catch(error => {
-            console.error('Error submitting answer:', error);
-            errorMessage.value = 'Failed to submit answer.';
-          })
-          .finally(() => {
-            loading.value = false;
-          });
+        .then(response => {
+          question.value.answers.push(response.data);
+          newAnswer.value.text = '';
+        })
+        .catch(error => {
+          console.error('Error submitting answer:', error);
+          errorMessage.value = 'Failed to submit answer.';
+        })
+        .finally(() => {
+          loading.value = false;
+        });
     };
 
-    const submitComment = (answerId) => {
-      loading.value = true;
-      axios.post('/api/comments', {
-        answerId: answerId,
-        text: newComments.value[answerId],
-      })
-          .then(response => {
-            const answer = question.value.answers.find(a => a.id === answerId);
-            if (answer) {
-              answer.comments.push(response.data);
-              newComments.value[answerId] = '';
-            }
-          })
-          .catch(error => {
-            console.error('Error submitting comment:', error);
-            errorMessage.value = 'Failed to submit comment.';
-          })
-          .finally(() => {
-            loading.value = false;
-          });
-    };
+    const computedRating = computed({
+      get() {
+        return rating.value;
+      },
+      set(value) {
+        rating.value = value;
+      }
+    });
 
     return {
       question,
       newAnswer,
-      newComments,
+      computedRating,
       submitAnswer,
-      submitComment,
       loading,
       errorMessage,
     };
@@ -139,105 +111,126 @@ export default {
 };
 </script>
 
-
-
 <style scoped>
 .discussion-page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
-  max-width: 100%;
+  padding: 20px;
+  background-color: #f5f5f5; 
+  border-radius: 5px; 
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); 
+  max-width: 800px; 
+  margin: auto;
 }
 
-.question-header, .question-title, .question-subject, .question-content {
+.question-header {
   text-align: center;
-  width: 100%;
-}
-
-.uploaded-image {
-  max-width: 100%;
-  height: auto;
-  margin: 1rem 0;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.answer-textarea, .add-comment textarea {
-  width: 100%;
-  min-height: 120px;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  resize: vertical;
-}
-
-.submit-answer-btn, .add-comment button {
-  padding: 0.5rem 1rem;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  transition: background-color 0.3s ease;
-}
-
-.submit-answer-btn:hover, .add-comment button:hover {
-  background-color: #45a049;
-}
-
-.answers {
-  width: 100%;
-}
-
-.answer {
-  background-color: #f0f0f0;
-  padding: 1rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.comments {
-  margin-top: 1rem;
-  padding-left: 1rem;
-}
-
-.comment {
-  background-color: #e8e8e8;
-  padding: 0.5rem;
-  margin-top: 0.5rem;
-  border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.add-comment {
-  margin-top: 1rem;
-}
-
-.add-comment textarea {
-  min-height: 80px;
+  padding: 20px; 
+  border-bottom: 1px solid #ddd;
 }
 
 .question-title {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  color: #333;
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #333; 
 }
 
 .question-subject {
-  margin-bottom: 1rem;
-  color: #666;
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #666; 
 }
 
-.question-content-box {
-  margin-bottom: 1rem;
+.uploaded-image {
+  width: 100%;
+  max-width: 500px;
+  margin: 20px 0;
+  border-radius: 5px; 
 }
 
 .question-content {
-  color: #333;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 20px; 
+  background-color: #fff; 
+  border-radius: 5px; 
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); 
 }
 
+.add-answer-section {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.answer-textarea {
+  width: calc(100% - 40px);
+  height: 100px;
+  resize: vertical;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.submit-answer-btn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-answer-btn:hover {
+  background-color: #0056b3;
+}
+
+.answers {
+  margin-top: 40px;
+}
+
+.answer {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.comments {
+  margin-top: 20px;
+}
+
+.comment {
+  background-color: #f0f0f0;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-comment {
+  margin-top: 20px;
+}
+
+.add-comment textarea {
+  width: calc(100% - 40px);
+  height: 80px;
+  resize: vertical;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.add-comment button {
+  padding: 8px 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-comment button:hover {
+  background-color: #218838;
+}
 </style>

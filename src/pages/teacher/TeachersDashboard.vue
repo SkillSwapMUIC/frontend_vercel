@@ -9,6 +9,18 @@
       </div>
     </div>
   </div>
+  <h1>Courses</h1>
+  <div class="courses-list">
+    <div class="course" v-for="course in courses" :key="course.id">
+      <h2>{{ course.title }}</h2>
+      <p>{{ course.description }}</p>
+      <div class="course-actions">
+        <button class="edit-button" @click="editCourse(course.id)">Edit</button>
+        <button class="delete-button" @click="deleteCourse(course.id)">Delete</button>
+      </div>
+    </div>
+    <button class="add-course-button" @click="addCourse">Add Course</button>
+  </div>
 </template>
 
 <script>
@@ -27,6 +39,15 @@ export default {
     answerQuestion(questionId) {
       // Navigate to the DiscussionPage component with the questionId as a parameter
       this.$router.push({ path: `/discussion/${questionId}` });
+    },
+    addCourse() {
+      this.$router.push({ name: 'TeacherCourse' });
+    },
+    editCourse(courseId) {
+      this.$router.push({ name: 'TeacherCourse', params: { courseId } });
+    },
+    deleteCourse(courseId) {
+      console.log(`Deleting course with ID: ${courseId}`);
     }
   }
 };
@@ -74,4 +95,49 @@ export default {
 .question:hover .answer-button {
   display: block;
 }
+
+.courses-list {
+  margin-top: 20px;
+}
+
+.course {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.course-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.edit-button, .delete-button {
+  margin-left: 5px;
+  padding: 5px 10px;
+  background-color: #2196F3; /* Blue for edit */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delete-button {
+  background-color: #f44336; /* Red for delete */
+}
+
+.add-course-button {
+  padding: 10px 20px;
+  background-color: #4CAF50; /* Green for add */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: block;
+  margin-top: 20px;
+}
+
 </style>
