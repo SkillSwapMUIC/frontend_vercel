@@ -6,6 +6,7 @@ import TeachersDashboard from '/src/pages/teacher/TeachersDashboard.vue';
 import CreateQuestionPage from "/src/pages/student/CreateQuestionPage.vue";
 import AdminPage from "/src/pages/admin/AdminPage.vue";
 import TeacherCreateCoursePage from "/src/pages/teacher/TeacherCreateCoursePage.vue";
+import AccessDenied from "/src/pages/teacher/AccessDenied.vue";
 // src/pages/login/RegistrationPage.vue
 import RegistrationPage from '/src/pages/login/RegistrationPage.vue';
 
@@ -19,6 +20,7 @@ const routes = [
     { path: '/admin', name: 'Admin', component:  AdminPage},
     { path: '/teacher-course', name: 'TeacherCourse', component:  TeacherCreateCoursePage},
     { path: '/register', name: 'Register', component: RegistrationPage },
+    {path: '/access-denied', name: 'AccessDenied', component: AccessDenied},
     //{ path: '/searchbar/autocomplete', name: 'SearchBarAutocomplete', component: SearchBarAutocomplete }
 ];
 

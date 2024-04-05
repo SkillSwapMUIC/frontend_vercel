@@ -1,5 +1,6 @@
 <template>
-  <div class="teachers-dashboard">
+  <div v-if="is_teacher">
+  <div class="teachers-dashboard" >
     <h1>List of Questions Posted by Learners</h1>
     <div class="question-list">
       <div class="question" v-for="question in learnerQuestions" :key="question.id">
@@ -21,11 +22,37 @@
     </div>
     <button class="add-course-button" @click="addCourse">Add Course</button>
   </div>
+  </div>
 </template>
 
 <script>
+import {onMounted, ref} from "vue";
+import axios from "axios";
+import routes from "../../utils/routes_config.js";
+import {store} from "../../utils/store.js";
+import router from "../../utils/router.js";
+
 export default {
   name: 'TeachersDashboard',
+  setup() {
+    const is_teacher = ref(false);
+    onMounted(() => {
+      axios.post(routes("is_teacher"), {
+            auth_token: store.auth_token
+      }
+      )
+          .then(response => {
+            console.log(response.data)
+            const access_denied = ! (response.data.access_allowed === "True")
+            if (access_denied) {
+              router.push({ name: 'AccessDenied' });
+            }else{
+              is_teacher.value = true;
+            }
+          })
+    });
+    return {is_teacher};
+  },
   data() {
     return {
       learnerQuestions: [
@@ -50,7 +77,8 @@ export default {
       console.log(`Deleting course with ID: ${courseId}`);
     }
   }
-};
+}
+
 </script>
 
 <style scoped>

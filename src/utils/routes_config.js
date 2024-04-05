@@ -1,4 +1,5 @@
 const backendURL =  'http://127.0.0.1:5555';
+//const backendURL =  'https://backend-vercel-gfov18y0q-jonas-projects-1617a641.vercel.app';
 
 const defined_routes = {
 
@@ -7,6 +8,9 @@ const defined_routes = {
     get_random_six_titles: "/qanda/getrandomsixtitles",
     login_to_backend: "/auth/login",
     submit_answer: "/qanda/answer-on",
+    get_all_subjects: "/qanda/all-subjects",
+    is_teacher: "/auth/is-teacher",
+    autocomplete_navbar: "/search/searchbar/autocomplete",
 }
 
 

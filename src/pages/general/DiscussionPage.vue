@@ -3,7 +3,6 @@
     <div class="question-header">
       <h1 v-if="question.title" class="question-title">{{ question.title }}</h1>
       <h2 v-if="question.subject" class="question-subject">Subject: {{ question.subject }}</h2>
-      <img v-if="question.imageUrl" :src="question.imageUrl" alt="Question image" class="uploaded-image">
     </div>
 
     <div class="creator-info">
@@ -14,11 +13,17 @@
       <p v-if="question.content" class="question-content">{{ question.content }}</p>
     </div>
 
+    <div v-if="showPreview" class="image-preview">
+      <img :src="question.imageUrl" alt="Image Preview">
+    </div>
+
+
     <div class="add-answer-section">
       <textarea class="answer-textarea" v-model="newAnswer" placeholder="Add your answer here..."></textarea>
       <StarRating v-model="computedRating" />
       <button class="submit-answer-btn" @click="submitAnswer">Submit Answer</button>
     </div>
+
 
     <div class="answers">
       <h2>Answers</h2>
@@ -31,7 +36,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import routes from "../../utils/routes_config.js";
@@ -56,6 +61,7 @@ export default {
     const rating = ref(0); 
     const loading = ref(false);
     const errorMessage = ref('');
+    const showPreview = ref(false);
 
 
     const fetchQuestionDetails = () => {
@@ -63,7 +69,9 @@ export default {
       loading.value = true;
       errorMessage.value = '';
 
-      axios.get(routes("get_thread_by_id") + question_id)
+      axios.post(routes("get_thread_by_id") + question_id, {
+        auth_token: store.auth_token
+      })
         .then(response => {
           console.log(response.data);
           question.value.title = response.data.title;
@@ -71,6 +79,10 @@ export default {
           question.value.subject = response.data.subject;
           question.value.creator = response.data.creator;
           question.value.answers = response.data.answers;
+          question.value.imageUrl = response.data.image_url;
+          if (question.value.imageUrl) {
+            showPreview.value = true;
+          }
         })
         .catch(error => {
           console.error('Error fetching question details:', error);
@@ -82,6 +94,8 @@ export default {
     };
 
     onMounted(fetchQuestionDetails);
+    watch(() => route.params.question_id, fetchQuestionDetails);
+
 
     const submitAnswer = () => {
       if (!newAnswer.value.trim()) {
@@ -130,6 +144,7 @@ export default {
       submitAnswer,
       loading,
       errorMessage,
+      showPreview
     };
   },
 };
@@ -275,5 +290,15 @@ export default {
 .answer-creator {
   font-size: 12px; /* Adjust as needed */
   color: #888; /* Adjust color if necessary */
+}
+.image-preview {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
 }
 </style>
