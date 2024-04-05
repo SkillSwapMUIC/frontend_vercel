@@ -15,7 +15,10 @@
 
       <div v-if="showLatexEditor" class="latex-editor">
         <textarea v-model="latexContent" class="latex-textarea" placeholder="Enter LaTeX content here..."></textarea>
-        <div class="latex-preview" v-html="latexPreview"></div>
+<!--        <div class="latex-preview" v-html="latexPreview"></div>-->
+        <div class="latex-preview">
+          {{latexPreview}}
+        </div>
       </div>
 
       <div class="image-url-field">
