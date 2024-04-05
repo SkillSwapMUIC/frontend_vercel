@@ -28,6 +28,7 @@ import { useRoute } from 'vue-router';
 import axios from 'axios';
 import routes from "../../utils/routes_config.js";
 import StarRating from "../../pages/general/StarRating.vue";
+import {store} from "../../utils/store.js";
 
 export default {
   components: {
@@ -73,10 +74,10 @@ export default {
     const submitAnswer = () => {
       let question_id = route.params.question_id
       loading.value = true;
-      axios.post(routes("submit_answer")+ "/" + question_id, {
-        questionId: route.params.id,
-        text: newAnswer.value,
-        rating: rating.value 
+      axios.post(routes("submit_answer") + "/" + question_id, {
+        content: newAnswer.value,
+        rating: rating.value,
+        auth_token: store.auth_token
       })
         .then(response => {
           question.value.answers.push(response.data);
