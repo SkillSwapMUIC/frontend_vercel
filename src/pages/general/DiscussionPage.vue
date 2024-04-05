@@ -63,7 +63,9 @@ export default {
       loading.value = true;
       errorMessage.value = '';
 
-      axios.get(routes("get_thread_by_id") + question_id)
+      axios.post(routes("get_thread_by_id") + question_id, {
+        auth_token: store.auth_token
+      })
         .then(response => {
           console.log(response.data);
           question.value.title = response.data.title;
