@@ -10,19 +10,21 @@
 
     <div class="question-details">
       <textarea v-model="editableContent" class="content-textarea" placeholder="Provide more information on the question..."></textarea>
-      <div class="image-upload-container">
-        <label for="image-upload" class="image-upload-label">
-          <span>Upload Image</span>
-          <input id="image-upload" type="file" @change="handleImageUpload" class="image-upload">
-        </label>
-        <div v-if="question.imageUrl" class="image-preview">
-          <img :src="question.imageUrl" alt="Uploaded Image" />
-        </div>
+
+      <div class="image-url-field">
+        <label for="image-url-input" class="image-url-label">If you want, you can share a link to a picture</label>
+        <input type="text" id="image-url-input" v-model="question.imageUrl" class="image-url-input" placeholder="Paste image URL here">
+        <button @click="showImagePreview" class="preview-button">Upload</button>
       </div>
+    </div>
+
+    <div v-if="showPreview" class="image-preview">
+      <img :src="question.imageUrl" alt="Image Preview">
+    </div>
 
       <button @click="saveContent" class="save-content-button">Save Content</button>
     </div>
-  </div>
+
 </template>
 
 <script>
@@ -48,19 +50,6 @@ export default {
       imageUrl: '',
     });
 
-    const handleImageUpload = (event) => {
-      const file = event.target.files[0];
-      if (file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          question.value.imageUrl = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      } else {
-        alert('Please upload an image file.');
-      }
-    };
-
     const questionPageSetup = () => {
       const queryTitle = route.query.question_title;
 
@@ -70,8 +59,6 @@ export default {
             if (response.data.length > 0) subjects.value = response.data;
 
           })
-
-
       if (queryTitle) {
         question.value.title = queryTitle;
       }
@@ -89,7 +76,7 @@ export default {
         title: question.value.title,
         content: editableContent.value,
         subject: selectedSubject.value,
-        imageUrl: question.value.imageUrl,
+        image_url: question.value.imageUrl,
         auth_token: store.auth_token
       })
           .then(response => {
@@ -107,19 +94,34 @@ export default {
             console.error('There was an error saving the question:', error);
             errorMessage.value = 'Failed to save the question. Please try again.';
           });
-    };
+    }
+
 
     return {
       subjects,
       selectedSubject,
       question,
       editableContent,
-      handleImageUpload,
       saveContent,
       isLoading,
       errorMessage,
     };
+
   },
+  data() {
+    return {
+      imageUrl: '', // Variable to store the image URL
+      showPreview: false // Variable to toggle image preview section
+    };
+  },
+  methods: {
+    showImagePreview() {
+      // Function to toggle image preview section
+      this.showPreview = true;
+    }
+  }
+
+
 };
 </script>
 
@@ -222,5 +224,42 @@ export default {
 
 .save-content-button:hover {
   background-color: #45a049;
+}
+
+.image-url-field {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.image-url-label {
+  margin-right: 1rem;
+}
+
+.image-url-input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.preview-button {
+  padding: 0.5rem 1rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.image-preview {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
 }
 </style>
