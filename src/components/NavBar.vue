@@ -8,8 +8,12 @@
           type="text"
           placeholder="Search..."
           v-model="searchQuery"
-          @keyup.enter="performSearch"
+          @keyup.enter="fetchSearchSuggestions"
       />
+      <ul v-if="searchSuggestions.length" class="search-suggestions">
+        <li v-for="(suggestion, index) in searchSuggestions" :key="index" @click="selectSuggestion(suggestion)">
+        </li>
+      </ul>
     </div>
     <div class="navbar-links">
       <ul>
@@ -22,14 +26,35 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'Navbar',
   data() {
     return {
-      searchQuery: ''
+      searchQuery: '',
+      searchSuggestions: [] 
     };
   },
   methods: {
+    async fetchSearchSuggestions() {
+      if (!this.searchQuery) {
+        this.searchSuggestions = [];
+        return;
+      }
+      try {
+        const response = await axios.get(`/search/searchbar/autocomplete?search=${this.searchQuery}`);
+        this.searchSuggestions = response.data;
+      } catch (error) {
+        console.error('Error fetching search suggestions:', error);
+        this.searchSuggestions = [];
+      }
+    },
+    selectSuggestion(suggestion) {
+      this.searchQuery = suggestion;
+      this.searchSuggestions = [];
+      this.performSearch();
+    },
     performSearch() {
       console.log('Searching for:', this.searchQuery);
       alert(`Searched for: ${this.searchQuery}`);
@@ -142,5 +167,24 @@ body {
   .navbar-links li {
     margin: 10px 0;
   }
+}
+.search-suggestions {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  z-index: 1;
+}
+
+.search-suggestions li {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.search-suggestions li:hover {
+  background-color: #f0f0f0;
 }
 </style>
