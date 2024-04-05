@@ -7,6 +7,8 @@ const defined_routes = {
     get_random_six_titles: "/qanda/getrandomsixtitles",
     login_to_backend: "/auth/login",
     submit_answer: "/qanda/answer-on",
+    get_all_subjects: "/qanda/all-subjects",
+    is_teacher: "/auth/is-teacher",
 }
 
 

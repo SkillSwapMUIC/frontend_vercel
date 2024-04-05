@@ -37,7 +37,7 @@ export default {
   setup() {
     const router = useRouter();
     const route = useRoute();
-    const subjects = ['Math', 'Programming', 'Science'];
+    const subjects =ref( ['Math', 'Programming']);  // just some default values
     const selectedSubject = ref('');
     const editableContent = ref('');
     const isLoading = ref(false);
@@ -61,14 +61,22 @@ export default {
       }
     };
 
-    const initializeQuestionWithQuery = () => {
+    const questionPageSetup = () => {
       const queryTitle = route.query.question_title;
+
+      axios.get(routes("get_all_subjects"))
+          .then(response => {
+            console.log(response.data)
+            subjects.value = response.data;
+          })
+
+
       if (queryTitle) {
         question.value.title = queryTitle;
       }
     };
 
-    onMounted(initializeQuestionWithQuery);
+    onMounted(questionPageSetup);
 
     const saveContent = () => {
       if (!selectedSubject.value || !question.value.title.trim()) {
