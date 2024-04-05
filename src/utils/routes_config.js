@@ -1,5 +1,5 @@
 //const backendURL =  'http://127.0.0.1:5555';
-const backendURL =  'https://backend-vercel-two.vercel.app/';
+const backendURL =  'https://backend-vercel-two.vercel.app';
 
 const defined_routes = {
 
