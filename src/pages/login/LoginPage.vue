@@ -2,6 +2,13 @@
   <div class="login-container">
     <div class="login-form">
       <h2>Login and Register</h2>
+      <div class="switch-container">
+        <label class="switch">
+          <input type="checkbox" v-model="isTeacher">
+          <span class="slider"></span>
+        </label>
+        <span>{{ isTeacher ? 'Teacher' : 'Student' }}</span>
+      </div>
       <form @submit.prevent="login">
         <div class="form-group">
           <label for="username">Username/Email:</label>
@@ -12,16 +19,17 @@
           <input type="password" id="password" v-model="password" placeholder="Enter password" required>
         </div>
         <button type="submit">Login</button>
-        <button @click="navigateToRegistration">Register</button>
+
+<!--        <button @click="navigateToRegistration">Register</button>-->
       </form>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-      <button @click="testSession">Test</button>
+<!--      <button @click="testSession">Test</button>-->
     </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios';
 import routes from "../../utils/routes_config.js";
 import { store } from "../../utils/store.js";
 import router from "../../utils/router.js";
@@ -31,7 +39,8 @@ export default {
     return {
       username: '',
       password: '',
-      errorMessage: ''
+      errorMessage: '',
+      isTeacher: false
     };
   },
   methods: {
@@ -40,16 +49,13 @@ export default {
         const response = await axios.post(routes("login_to_backend"), {
           username: this.username,
           password: this.password,
-          role: "user"
-        }, {
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          role: this.isTeacher ? 'teacher' : 'student',
+          auth_token: store.auth_token
         });
 
         if (response.status === 200) {
-          let user_token = response.data;
-          store.user_token = user_token;
+          store.auth_token = response.data.auth_token;
+          console.log('Stored auth token:', store.auth_token);
           await router.push({ name: 'Home' });
         } else {
           this.errorMessage = 'Invalid username or password';
@@ -59,14 +65,14 @@ export default {
         this.errorMessage = 'An error occurred. Please try again later.';
       }
     },
+
     navigateToRegistration() {
-  console.log("Navigating to registration page");
-  this.$router.push({ name: 'Register' });
-},
+      console.log("Navigating to registration page");
+      this.$router.push({ name: 'Register' });
+    },
 
     async testSession() {
-      console.log('Testing session...');
-      alert('Session tested!');
+      console.log("Logging session token:", store.auth_token);
     }
   }
 };
@@ -115,6 +121,7 @@ export default {
 }
 
 button {
+  margin: 12px 0 0 0;
   width: 100%;
   padding: 12px;
   background-color: #007bff;
@@ -133,5 +140,65 @@ button:hover {
   color: #ff0000;
   margin-top: 15px;
   text-align: center;
+}
+
+.switch-container {
+  display: flex;
+  align-items: center;
+}
+
+.switch {
+  margin-top: 12px;
+  margin-bottom: 20px;
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
 }
 </style>

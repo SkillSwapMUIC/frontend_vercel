@@ -28,8 +28,9 @@
 <script>
 import {onMounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
-import axios from 'axios';
+import axios from 'axios'
 import routes from "../../utils/routes_config.js";
+import {store} from "../../utils/store.js";
 
 
 export default {
@@ -80,7 +81,7 @@ export default {
         content: editableContent.value,
         subject: selectedSubject.value,
         imageUrl: question.value.imageUrl,
-        user_id: "MockID"
+        auth_token: store.auth_token
       })
           .then(response => {
             isLoading.value = false;
