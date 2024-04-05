@@ -16,7 +16,6 @@
       <div v-if="showLatexEditor" class="latex-editor">
         <textarea v-model="latexContent" class="latex-textarea" placeholder="Enter LaTeX content here..."></textarea>
         <div class="latex-preview" v-html="latexPreview"></div>
-<!--        <button @click="renderLatex" class="render-latex-button">Render LaTeX</button>-->
       </div>
 
       <div class="image-url-field">
