@@ -41,6 +41,7 @@ import {useRoute, useRouter} from 'vue-router';
 import axios from 'axios'
 import routes from "../../utils/routes_config.js";
 import {store} from "../../utils/store.js";
+import DOMPurify from 'dompurify';
 
 export default {
   setup() {
@@ -112,7 +113,7 @@ export default {
     };
 
     const renderLatex = () => {
-      latexPreview.value = `$$${latexContent.value}$$`;
+      latexPreview.value = DOMPurify.sanitize(`$$${latexContent.value}$$`);
       nextTick(() => {
         MathJax.typesetPromise().catch((err) => console.log('MathJax typesetPromise failed:', err));
       });
