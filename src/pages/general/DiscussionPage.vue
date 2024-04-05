@@ -6,6 +6,10 @@
       <img v-if="question.imageUrl" :src="question.imageUrl" alt="Question image" class="uploaded-image">
     </div>
 
+    <div class="creator-info">
+      <p class="creator">Creator: {{ question.creator }}</p>
+    </div>
+
     <div class="question-content-box">
       <p v-if="question.content" class="question-content">{{ question.content }}</p>
     </div>
@@ -18,6 +22,10 @@
 
     <div class="answers">
       <h2>Answers</h2>
+      <div v-for="answer in question.answers" :key="answer.id" class="answer">
+        <p class="answer-content">{{ answer.content }}</p>
+        <p class="answer-creator">Creator: {{ answer.creator }}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -41,6 +49,7 @@ export default {
       subject: '',
       content: '',
       imageUrl: '',
+      creator: '',
       answers: [],
     });
     const newAnswer = ref('');
@@ -56,9 +65,12 @@ export default {
 
       axios.get(routes("get_thread_by_id") + question_id)
         .then(response => {
+          console.log(response.data);
           question.value.title = response.data.title;
           question.value.content = response.data.content;
           question.value.subject = response.data.subject;
+          question.value.creator = response.data.creator;
+          question.value.answers = response.data.answers;
         })
         .catch(error => {
           console.error('Error fetching question details:', error);
@@ -72,25 +84,35 @@ export default {
     onMounted(fetchQuestionDetails);
 
     const submitAnswer = () => {
-      let question_id = route.params.question_id
+      if (!newAnswer.value.trim()) {
+        errorMessage.value = 'Answer cannot be empty.';
+        return;
+      }
+
+      let question_id = route.params.question_id;
       loading.value = true;
       axios.post(routes("submit_answer") + "/" + question_id, {
         content: newAnswer.value,
         rating: rating.value,
         auth_token: store.auth_token
       })
-        .then(response => {
-          question.value.answers.push(response.data);
-          newAnswer.value = '';
-        })
-        .catch(error => {
-          console.error('Error submitting answer:', error);
-          errorMessage.value = 'Failed to submit answer.';
-        })
-        .finally(() => {
-          loading.value = false;
-        });
+          .then(response => {
+            if (response.data.message === "Answer submitted successfully") {
+              newAnswer.value = ''; // Clear the answer field
+              fetchQuestionDetails();
+            } else {
+              errorMessage.value = 'Failed to submit answer.';
+            }
+          })
+          .catch(error => {
+            console.error('Error submitting answer:', error);
+            errorMessage.value = 'Failed to submit answer.';
+          })
+          .finally(() => {
+            loading.value = false;
+          });
     };
+
 
     const computedRating = computed({
       get() {
@@ -234,5 +256,24 @@ export default {
 
 .add-comment button:hover {
   background-color: #218838;
+}
+
+.creator-info {
+  margin-bottom: 10px;
+}
+
+.creator {
+  font-size: 14px; /* Adjust as needed */
+  color: #666; /* Adjust color if necessary */
+}
+
+.answer-content {
+  font-size: 16px; /* Adjust as needed */
+  /* Other styles for answer content */
+}
+
+.answer-creator {
+  font-size: 12px; /* Adjust as needed */
+  color: #888; /* Adjust color if necessary */
 }
 </style>
