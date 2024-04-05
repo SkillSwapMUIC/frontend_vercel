@@ -9,6 +9,7 @@ const defined_routes = {
     submit_answer: "/qanda/answer-on",
     get_all_subjects: "/qanda/all-subjects",
     is_teacher: "/auth/is-teacher",
+    autocomplete_navbar: "/search/searchbar/autocomplete",
 }
 
 

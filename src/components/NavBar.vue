@@ -8,11 +8,11 @@
           type="text"
           placeholder="Search..."
           v-model="searchQuery"
-          @keyup.enter="fetchSearchSuggestions"
+          @keyup="fetchSearchSuggestions"
       />
       <ul v-if="searchSuggestions.length" class="search-suggestions">
         <li v-for="(suggestion, index) in searchSuggestions" :key="index" @click="selectSuggestion(suggestion)">
-          {{ suggestion }}
+          {{ suggestion.result }}
         </li>
       </ul>
     </div>
@@ -28,40 +28,49 @@
 
 <script>
 import axios from 'axios';
+import routes from "../utils/routes_config.js";
+import {ref} from "vue";
+import router from "../utils/router.js";
 
 export default {
   name: 'Navbar',
-  data() {
-    return {
-      searchQuery: '',
-      searchSuggestions: [] 
-    };
-  },
-  methods: {
-    async fetchSearchSuggestions() {
-      if (!this.searchQuery) {
-        this.searchSuggestions = [];
+
+  setup(){
+    const searchQuery = ref('');
+    const searchSuggestions = ref([]);
+
+    const fetchSearchSuggestions = async () => {
+      if (!searchQuery.value) {
+        searchSuggestions.value = [];
         return;
       }
       try {
-        const response = await axios.get(`/search/searchbar/autocomplete?search=${this.searchQuery}`);
-        this.searchSuggestions = response.data;
+        const response = await axios.post(routes("autocomplete_navbar"), {"search_key": searchQuery.value});
+        searchSuggestions.value = response.data;
       } catch (error) {
         console.error('Error fetching search suggestions:', error);
-        this.searchSuggestions = [];
+        searchSuggestions.value = [];
       }
-    },
-    selectSuggestion(suggestion) {
-      this.searchQuery = suggestion;
-      this.searchSuggestions = [];
-      this.performSearch();
-    },
-    performSearch() {
-      console.log('Searching for:', this.searchQuery);
-      alert(`Searched for: ${this.searchQuery}`);
-      this.searchQuery = '';
-    }
-  }
+    };
+
+    const selectSuggestion = (selected_suggestion) => {
+      router.push({
+        name: 'Discussion',
+        params: { question_id: selected_suggestion.id },
+      });
+      searchQuery.value = '';
+      searchSuggestions.value = [];
+    };
+
+    return {
+      searchQuery,
+      searchSuggestions,
+      fetchSearchSuggestions,
+      selectSuggestion
+    };
+  },
+
+
 };
 </script>
 
@@ -171,8 +180,10 @@ body {
 }
 .search-suggestions {
   position: absolute;
+  top: 50px;
   background-color: white;
   border: 1px solid #ccc;
+  color: #1a1a1a;
   border-top: none;
   list-style-type: none;
   padding: 0;

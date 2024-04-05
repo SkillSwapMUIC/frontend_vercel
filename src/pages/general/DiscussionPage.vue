@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import routes from "../../utils/routes_config.js";
@@ -84,6 +84,8 @@ export default {
     };
 
     onMounted(fetchQuestionDetails);
+    watch(() => route.params.question_id, fetchQuestionDetails);
+
 
     const submitAnswer = () => {
       if (!newAnswer.value.trim()) {
