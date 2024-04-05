@@ -18,7 +18,8 @@ const routes = [
     { path: '/create-question', name: 'CreateQuestion', component: CreateQuestionPage,props: true},
     { path: '/admin', name: 'Admin', component:  AdminPage},
     { path: '/teacher-course', name: 'TeacherCourse', component:  TeacherCreateCoursePage},
-    { path: '/register', name: 'Register', component: RegistrationPage }
+    { path: '/register', name: 'Register', component: RegistrationPage },
+    { path: '/searchbar/autocomplete', name: 'SearchBarAutocomplete', component: SearchBarAutocomplete } 
 ];
 
 const router = createRouter({
