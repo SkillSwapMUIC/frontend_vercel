@@ -123,7 +123,6 @@ export default {
     watch(latexContent, renderLatex);
 
     onMounted(() => {
-      // sonarignore:start
       if (window.MathJax) {
         window.MathJax.typesetPromise();
       } else {
@@ -135,7 +134,6 @@ export default {
           window.MathJax.typesetPromise();
         };
       }
-      // sonarignore:end
     });
 
     return {
