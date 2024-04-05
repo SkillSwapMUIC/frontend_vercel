@@ -11,6 +11,16 @@
     <div class="question-details">
       <textarea v-model="editableContent" class="content-textarea" placeholder="Provide more information on the question..."></textarea>
 
+      <button @click="toggleLatexEditor" class="latex-toggle-button">Add LaTeX formula to your question</button>
+
+      <div v-if="showLatexEditor" class="latex-editor">
+        <textarea v-model="latexContent" class="latex-textarea" placeholder="Enter LaTeX content here..."></textarea>
+<!--        <div class="latex-preview" v-html="latexPreview"></div>-->
+        <div class="latex-preview">
+          {{latexPreview}}
+        </div>
+      </div>
+
       <div class="image-url-field">
         <label for="image-url-input" class="image-url-label">If you want, you can share a link to a picture</label>
         <input type="text" id="image-url-input" v-model="question.imageUrl" class="image-url-input" placeholder="Paste image URL here">
@@ -28,12 +38,12 @@
 </template>
 
 <script>
-import {onMounted, ref} from 'vue';
+import {onMounted, ref, watch, nextTick} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import axios from 'axios'
 import routes from "../../utils/routes_config.js";
 import {store} from "../../utils/store.js";
-
+import DOMPurify from 'dompurify';
 
 export default {
   setup() {
@@ -44,6 +54,9 @@ export default {
     const editableContent = ref('');
     const isLoading = ref(false);
     const errorMessage = ref('');
+    const showLatexEditor = ref(false);
+    const latexContent = ref('');
+    const latexPreview = ref('');
     const question = ref({
       title: '',
       content: '',
@@ -75,6 +88,7 @@ export default {
       axios.post(routes("submit_question"), {
         title: question.value.title,
         content: editableContent.value,
+        latex_content: latexContent.value,
         subject: selectedSubject.value,
         image_url: question.value.imageUrl,
         auth_token: store.auth_token
@@ -96,6 +110,34 @@ export default {
           });
     }
 
+    const toggleLatexEditor = () => {
+      showLatexEditor.value = !showLatexEditor.value;
+    };
+
+    const renderLatex = () => {
+      latexPreview.value = DOMPurify.sanitize(`$$${latexContent.value}$$`);
+      nextTick(() => {
+        if (window.MathJax) {
+          window.MathJax.typesetPromise().catch(err => console.error('MathJax typesetPromise failed:', err));
+        }
+      });
+    };
+
+    watch(latexContent, renderLatex);
+
+    onMounted(() => {
+      if (window.MathJax) {
+        window.MathJax.typesetPromise();
+      } else {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+        script.async = true;
+        document.head.appendChild(script);
+        script.onload = () => {
+          window.MathJax.typesetPromise();
+        };
+      }
+    });
 
     return {
       subjects,
@@ -105,6 +147,11 @@ export default {
       saveContent,
       isLoading,
       errorMessage,
+      showLatexEditor,
+      latexContent,
+      latexPreview,
+      toggleLatexEditor,
+      renderLatex,
     };
 
   },
@@ -227,6 +274,7 @@ export default {
 }
 
 .image-url-field {
+  padding-top: 30px;
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
@@ -262,4 +310,42 @@ export default {
   max-height: 300px;
   border-radius: 8px;
 }
+
+.latex-toggle-button,
+.render-latex-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.latex-toggle-button:hover,
+.render-latex-button:hover {
+  background-color: #45a049;
+}
+
+.latex-editor {
+  margin-top: 1rem;
+}
+
+.latex-textarea {
+  width: 100%;
+  min-height: 100px;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.latex-preview {
+  padding: 1rem;
+  background-color: #f7f7f7;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 </style>

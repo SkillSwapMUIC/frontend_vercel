@@ -3,7 +3,7 @@
     <h1>Welcome to SkillSwap</h1>
     <p>Need help with your studies?</p>
     <p>Get help with challenging assignments.</p>
-    <img src="/src/assets/logo.png" alt="SkillSwap Logo" class="logo-image">
+    <img src="../assets/logo.png" alt="SkillSwap Logo" class="logo-image">
   </div>
   <div class="question-box-container">
     <question-box></question-box>
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import QuestionBox from '/src/components/QuestionBox.vue';
+import QuestionBox from '../components/QuestionBox.vue';
 import ExploreSection from "../components/ExploreSection.vue";
 
 export default {

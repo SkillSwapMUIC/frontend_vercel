@@ -1,14 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import LoginPage from '/src/pages/login/LoginPage.vue';
-import HomePage from "/src/pages/HomePage.vue";
-import DiscussionPage from "/src/pages/general/DiscussionPage.vue";
-import TeachersDashboard from '/src/pages/teacher/TeachersDashboard.vue';
-import CreateQuestionPage from "/src/pages/student/CreateQuestionPage.vue";
-import AdminPage from "/src/pages/admin/AdminPage.vue";
-import TeacherCreateCoursePage from "/src/pages/teacher/TeacherCreateCoursePage.vue";
-import AccessDenied from "/src/pages/teacher/AccessDenied.vue";
-// src/pages/login/RegistrationPage.vue
-import RegistrationPage from '/src/pages/login/RegistrationPage.vue';
+import LoginPage from '../pages/login/LoginPage.vue';
+import HomePage from "../pages/HomePage.vue";
+import DiscussionPage from "../pages/general/DiscussionPage.vue";
+import TeachersDashboard from '../pages/teacher/TeachersDashboard.vue';
+import CreateQuestionPage from "../pages/student/CreateQuestionPage.vue";
+import AdminPage from "../pages/admin/AdminPage.vue";
+import TeacherCreateCoursePage from "../pages/teacher/TeacherCreateCoursePage.vue";
+import AccessDenied from "../pages/teacher/AccessDenied.vue";
+import RegistrationPage from '../pages/login/RegistrationPage.vue';
 
 
 const routes = [
