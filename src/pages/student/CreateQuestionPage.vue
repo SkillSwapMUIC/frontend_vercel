@@ -11,12 +11,12 @@
     <div class="question-details">
       <textarea v-model="editableContent" class="content-textarea" placeholder="Provide more information on the question..."></textarea>
 
-      <button @click="toggleLatexEditor" class="latex-toggle-button">Toggle LaTeX Editor</button>
+      <button @click="toggleLatexEditor" class="latex-toggle-button">Add LaTeX formula to your question</button>
 
       <div v-if="showLatexEditor" class="latex-editor">
         <textarea v-model="latexContent" class="latex-textarea" placeholder="Enter LaTeX content here..."></textarea>
         <div class="latex-preview" v-html="latexPreview"></div>
-        <button @click="renderLatex" class="render-latex-button">Render LaTeX</button>
+<!--        <button @click="renderLatex" class="render-latex-button">Render LaTeX</button>-->
       </div>
 
       <div class="image-url-field">
@@ -85,7 +85,7 @@ export default {
       axios.post(routes("submit_question"), {
         title: question.value.title,
         content: editableContent.value,
-        latexContent: latexContent.value,
+        latex_content: latexContent.value,
         subject: selectedSubject.value,
         image_url: question.value.imageUrl,
         auth_token: store.auth_token
@@ -269,6 +269,7 @@ export default {
 }
 
 .image-url-field {
+  padding-top: 30px;
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
