@@ -67,7 +67,8 @@ export default {
       axios.get(routes("get_all_subjects"))
           .then(response => {
             console.log(response.data)
-            subjects.value = response.data;
+            if (response.data.length > 0) subjects.value = response.data;
+
           })
 
 
