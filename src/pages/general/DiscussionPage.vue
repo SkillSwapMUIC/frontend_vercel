@@ -30,6 +30,8 @@
       <div v-for="answer in question.answers" :key="answer.id" class="answer">
         <p class="answer-content">{{ answer.content }}</p>
         <p class="answer-creator">Creator: {{ answer.creator }}</p>
+        <button v-if="answer.allowed_to_delete" @click="deleteAnswer(answer.id)">Delete</button>
+        <button v-if="answer.allowed_to_edit" @click="editAnswer(answer.id)">Edit</button>
       </div>
     </div>
   </div>
@@ -58,11 +60,10 @@ export default {
       answers: [],
     });
     const newAnswer = ref('');
-    const rating = ref(0); 
+    const rating = ref(0);
     const loading = ref(false);
     const errorMessage = ref('');
     const showPreview = ref(false);
-
 
     const fetchQuestionDetails = () => {
       let question_id = route.params.question_id;
@@ -96,7 +97,6 @@ export default {
     onMounted(fetchQuestionDetails);
     watch(() => route.params.question_id, fetchQuestionDetails);
 
-
     const submitAnswer = () => {
       if (!newAnswer.value.trim()) {
         errorMessage.value = 'Answer cannot be empty.';
@@ -110,23 +110,83 @@ export default {
         rating: rating.value,
         auth_token: store.auth_token
       })
-          .then(response => {
-            if (response.data.message === "Answer submitted successfully") {
-              newAnswer.value = ''; // Clear the answer field
-              fetchQuestionDetails();
-            } else {
-              errorMessage.value = 'Failed to submit answer.';
-            }
-          })
-          .catch(error => {
-            console.error('Error submitting answer:', error);
+        .then(response => {
+          if (response.data.message === "Answer submitted successfully") {
+            newAnswer.value = ''; 
+            fetchQuestionDetails();
+          } else {
             errorMessage.value = 'Failed to submit answer.';
-          })
-          .finally(() => {
-            loading.value = false;
-          });
+          }
+        })
+        .catch(error => {
+          console.error('Error submitting answer:', error);
+          errorMessage.value = 'Failed to submit answer.';
+        })
+        .finally(() => {
+          loading.value = false;
+        });
     };
 
+    const deleteAnswer = (answerId) => {
+      const authToken = store.auth_token;
+      if (!authToken) {
+        errorMessage.value = 'Authentication token not found.';
+        return;
+      }
+
+      loading.value = true;
+      axios.post(`/delete/${answerId}`, { auth_token: authToken })
+        .then(response => {
+          if (response.status === 200) {
+            fetchQuestionDetails(); 
+          } else {
+            errorMessage.value = 'Failed to delete answer.';
+          }
+        })
+        .catch(error => {
+          console.error('Error deleting answer:', error);
+          errorMessage.value = 'Failed to delete answer.';
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+    };
+
+    const editAnswer = (answerId) => {
+      const newContent = prompt('Enter the new content for the answer:');
+      if (!newContent) {
+         return;
+      }
+      
+      const authToken = store.auth_token;
+      if (!authToken) {
+        errorMessage.value = 'Authentication token not found.';
+        return;
+      }
+      
+      loading.value = true;
+      axios.post(`/edit_answer/${answerId}`, {
+        content: newContent,
+        auth_token: authToken
+      })
+      .then(response => {
+        if (response.status === 200) {
+          const editedAnswer = question.value.answers.find(answer => answer.id === answerId);
+          if (editedAnswer) {
+            editedAnswer.content = newContent;
+          }
+      } else {
+        errorMessage.value = 'Failed to edit answer.';
+      }
+    })
+    .catch(error => {
+      console.error('Error editing answer:', error);
+      errorMessage.value = 'Failed to edit answer.';
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+};
 
     const computedRating = computed({
       get() {
@@ -144,7 +204,9 @@ export default {
       submitAnswer,
       loading,
       errorMessage,
-      showPreview
+      showPreview,
+      deleteAnswer,
+      editAnswer
     };
   },
 };
