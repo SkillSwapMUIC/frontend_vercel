@@ -115,7 +115,9 @@ export default {
     const renderLatex = () => {
       latexPreview.value = DOMPurify.sanitize(`$$${latexContent.value}$$`);
       nextTick(() => {
-        MathJax.typesetPromise().catch((err) => console.log('MathJax typesetPromise failed:', err));
+        if (window.MathJax) {
+          window.MathJax.typesetPromise().catch(err => console.error('MathJax typesetPromise failed:', err));
+        }
       });
     };
 
