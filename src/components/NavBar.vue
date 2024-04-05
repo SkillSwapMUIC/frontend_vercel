@@ -12,6 +12,7 @@
       />
       <ul v-if="searchSuggestions.length" class="search-suggestions">
         <li v-for="(suggestion, index) in searchSuggestions" :key="index" @click="selectSuggestion(suggestion)">
+          {{ suggestion }}
         </li>
       </ul>
     </div>
