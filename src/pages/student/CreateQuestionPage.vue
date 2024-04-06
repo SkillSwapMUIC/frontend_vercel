@@ -44,6 +44,7 @@ import axios from 'axios'
 import routes from "../../utils/routes_config.js";
 import {store} from "../../utils/store.js";
 import DOMPurify from 'dompurify';
+import { wrapLatexContent } from '../../utils/latexWrapper.js';
 
 export default {
   setup() {
@@ -84,11 +85,13 @@ export default {
         alert('Please fill in all the fields.');
         return;
       }
+      const wrappedLatexContent = wrapLatexContent(latexContent.value);
+
       isLoading.value = true;
       axios.post(routes("submit_question"), {
         title: question.value.title,
         content: editableContent.value,
-        latex_content: latexContent.value,
+        latex_content: wrappedLatexContent,
         subject: selectedSubject.value,
         image_url: question.value.imageUrl,
         auth_token: store.auth_token
