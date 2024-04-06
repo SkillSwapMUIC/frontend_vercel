@@ -34,6 +34,8 @@
         <button v-if="answer.allowed_to_edit" @click="editAnswer(answer.id)">Edit</button>
       </div>
     </div>
+    <EditAnswerModal v-if="showEditModal" :initialContent="editedAnswer.content" @edit="saveEdit" @cancel="cancelEdit" />
+
   </div>
 </template>
 
@@ -44,10 +46,12 @@ import axios from 'axios';
 import routes from "../../utils/routes_config.js";
 import StarRating from "../../pages/general/StarRating.vue";
 import {store} from "../../utils/store.js";
+import EditAnswerModal from './EditAnswerModal.vue';
 
 export default {
   components: {
-    StarRating
+    StarRating,
+    EditAnswerModal
   },
   setup() {
     const route = useRoute();
@@ -64,6 +68,10 @@ export default {
     const loading = ref(false);
     const errorMessage = ref('');
     const showPreview = ref(false);
+    const showEditModal = ref(false); 
+
+    const editedAnswer = ref(null); 
+
 
     const fetchQuestionDetails = () => {
       let question_id = route.params.question_id;
@@ -153,12 +161,24 @@ export default {
     };
 
     const editAnswer = (answerId) => {
-      const newContent = prompt('Enter the new content for the answer:');
-      if (!newContent) {
-         return;
+      editedAnswer.value = question.value.answers.find(answer => answer.id === answerId);
+      if (editedAnswer.value) {
+        showEditModal.value = true;
       }
-      
-      const authToken = store.auth_token;
+    };
+    
+
+    const saveEdit = (editedContent) => {
+      editedAnswer.value.content = editedContent;
+
+      showEditModal.value = false;
+    };
+
+    const cancelEdit = () => {
+      showEditModal.value = false;
+    };
+
+    const authToken = store.auth_token;
       if (!authToken) {
         errorMessage.value = 'Authentication token not found.';
         return;
@@ -186,7 +206,7 @@ export default {
     .finally(() => {
       loading.value = false;
     });
-};
+
 
     const computedRating = computed({
       get() {
@@ -206,10 +226,14 @@ export default {
       errorMessage,
       showPreview,
       deleteAnswer,
-      editAnswer
+      editAnswer,
+      showEditModal, 
+      saveEdit, 
+      cancelEdit 
     };
   },
 };
+
 </script>
 
 <style scoped>
