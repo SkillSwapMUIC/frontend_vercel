@@ -13,6 +13,11 @@
       <p v-if="question.content" class="question-content">{{ question.content }}</p>
     </div>
 
+    <div v-if="question.latexContent" class="latex-content">
+      <h3>Latex:</h3>
+      <div ref="latexContainer"></div>
+    </div>
+
     <div v-if="showPreview" class="image-preview">
       <img :src="question.imageUrl" alt="Image Preview">
     </div>
@@ -40,11 +45,14 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import routes from "../../utils/routes_config.js";
-import { store } from "../../utils/store.js";
+import StarRating from "../../pages/general/StarRating.vue";
+import {store} from "../../utils/store.js";
+import DOMPurify from 'dompurify';
+import { wrapLatexContent } from '../../utils/latexWrapper.js';
 
 export default {
   setup() {
@@ -54,6 +62,7 @@ export default {
       subject: '',
       content: '',
       imageUrl: '',
+      latexContent: '',
       creator: '',
       answers: [],
     });
@@ -80,9 +89,19 @@ export default {
           question.value.creator = response.data.creator;
           question.value.answers = response.data.answers;
           question.value.imageUrl = response.data.image_url;
+          question.value.latexContent = response.data.latex_content;
           if (question.value.imageUrl) {
             showPreview.value = true;
           }
+          nextTick(() => {
+            const latexDiv = document.querySelector('.latex-content');
+            if (latexDiv && question.value.latexContent) {
+              const isAlreadyWrapped = question.value.latexContent.trim().startsWith('$$');
+              const contentToRender = isAlreadyWrapped ? question.value.latexContent : `$$${question.value.latexContent.trim()}$$`;
+              latexDiv.innerHTML = DOMPurify.sanitize(contentToRender);
+              window.MathJax.typesetPromise([latexDiv]);
+            }
+          });
         })
         .catch(error => {
           console.error('Error fetching question details:', error);
@@ -92,6 +111,26 @@ export default {
           loading.value = false;
         });
     };
+
+    function ensureMathJax(callback) {
+      if (window.MathJax) {
+        callback();
+      } else {
+        // Load MathJax script dynamically
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+        document.head.appendChild(script);
+        script.onload = () => callback();
+      }
+    }
+
+    // Method to display LaTeX content using MathJax
+    function displayLatexContent(content) {
+      const latexDiv = document.createElement('div');
+      latexDiv.innerHTML = content;
+      document.querySelector('.latex-content').appendChild(latexDiv);
+      window.MathJax.typesetPromise([latexDiv]);
+    }
 
     onMounted(fetchQuestionDetails);
     watch(() => route.params.question_id, fetchQuestionDetails);

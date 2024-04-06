@@ -44,6 +44,7 @@ import axios from 'axios'
 import routes from "../../utils/routes_config.js";
 import {store} from "../../utils/store.js";
 import DOMPurify from 'dompurify';
+import { wrapLatexContent } from '../../utils/latexWrapper.js';
 
 export default {
   setup() {
@@ -84,6 +85,7 @@ export default {
         alert('Please fill in all the fields.');
         return;
       }
+
       isLoading.value = true;
       axios.post(routes("submit_question"), {
         title: question.value.title,
@@ -115,10 +117,14 @@ export default {
     };
 
     const renderLatex = () => {
-      latexPreview.value = DOMPurify.sanitize(`$$${latexContent.value}$$`);
+      const isAlreadyWrapped = latexContent.value.trim().startsWith('$$');
+      const contentToRender = isAlreadyWrapped ? latexContent.value : `$$${latexContent.value}$$`;
+      latexPreview.value = DOMPurify.sanitize(contentToRender);
       nextTick(() => {
         if (window.MathJax) {
-          window.MathJax.typesetPromise().catch(err => console.error('MathJax typesetPromise failed:', err));
+          window.MathJax.typesetPromise()
+              .then(() => console.log('LaTeX rendered successfully.'))
+              .catch(err => console.error('MathJax typesetPromise failed:', err));
         }
       });
     };
