@@ -39,6 +39,8 @@
         <button v-if="answer.allowed_to_edit" @click="editAnswer(answer.id)">Edit</button>
       </div>
     </div>
+    <EditAnswerModal v-if="showEditModal" :initialContent="editedAnswer.content" @edit="saveEdit" @cancel="cancelEdit" />
+
   </div>
 </template>
 
@@ -53,9 +55,6 @@ import DOMPurify from 'dompurify';
 import { wrapLatexContent } from '../../utils/latexWrapper.js';
 
 export default {
-  components: {
-    StarRating
-  },
   setup() {
     const route = useRoute();
     const question = ref({
@@ -68,10 +67,11 @@ export default {
       answers: [],
     });
     const newAnswer = ref('');
-    const rating = ref(0);
     const loading = ref(false);
     const errorMessage = ref('');
     const showPreview = ref(false);
+    const showEditModal = ref(false); 
+    const editedAnswer = ref(null); 
 
     const fetchQuestionDetails = () => {
       let question_id = route.params.question_id;
@@ -145,7 +145,6 @@ export default {
       loading.value = true;
       axios.post(routes("submit_answer") + "/" + question_id, {
         content: newAnswer.value,
-        rating: rating.value,
         auth_token: store.auth_token
       })
         .then(response => {
@@ -173,7 +172,7 @@ export default {
       }
 
       loading.value = true;
-      axios.post(`/delete/${answerId}`, { auth_token: authToken })
+      axios.post(routes("delete_answer") + "/" + answerId, { auth_token: authToken })
         .then(response => {
           if (response.status === 200) {
             fetchQuestionDetails(); 
@@ -190,65 +189,60 @@ export default {
         });
     };
 
-    const editAnswer = (answerId) => {
-      const newContent = prompt('Enter the new content for the answer:');
-      if (!newContent) {
-         return;
-      }
-      
+    const editAnswer = (answer) => {
+      editedAnswer.value = answer;
+      showEditModal.value = true;
+    };
+
+    const saveEdit = (editedContent) => {
       const authToken = store.auth_token;
       if (!authToken) {
         errorMessage.value = 'Authentication token not found.';
         return;
       }
-      
+
       loading.value = true;
-      axios.post(`/edit_answer/${answerId}`, {
-        content: newContent,
+      axios.post(routes("edit_answer") + "/" + editedAnswer.value.id, {
+        content: editedContent,
         auth_token: authToken
       })
-      .then(response => {
-        if (response.status === 200) {
-          const editedAnswer = question.value.answers.find(answer => answer.id === answerId);
-          if (editedAnswer) {
-            editedAnswer.content = newContent;
+        .then(response => {
+          if (response.status === 200) {
+            editedAnswer.value.content = editedContent;
+            showEditModal.value = false;
+          } else {
+            errorMessage.value = 'Failed to edit answer.';
           }
-      } else {
-        errorMessage.value = 'Failed to edit answer.';
-      }
-    })
-    .catch(error => {
-      console.error('Error editing answer:', error);
-      errorMessage.value = 'Failed to edit answer.';
-    })
-    .finally(() => {
-      loading.value = false;
-    });
-};
+        })
+        .catch(error => {
+          console.error('Error editing answer:', error);
+          errorMessage.value = 'Failed to edit answer.';
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+    };
 
-    const computedRating = computed({
-      get() {
-        return rating.value;
-      },
-      set(value) {
-        rating.value = value;
-      }
-    });
+    const cancelEdit = () => {
+      showEditModal.value = false;
+    };
 
     return {
       question,
       newAnswer,
-      computedRating,
-      submitAnswer,
       loading,
       errorMessage,
       showPreview,
       deleteAnswer,
-      editAnswer
+      editAnswer,
+      showEditModal, 
+      saveEdit, 
+      cancelEdit 
     };
   },
 };
 </script>
+
 
 <style scoped>
 .discussion-page {
