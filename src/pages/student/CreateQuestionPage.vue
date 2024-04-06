@@ -85,13 +85,12 @@ export default {
         alert('Please fill in all the fields.');
         return;
       }
-      const wrappedLatexContent = wrapLatexContent(latexContent.value);
 
       isLoading.value = true;
       axios.post(routes("submit_question"), {
         title: question.value.title,
         content: editableContent.value,
-        latex_content: wrappedLatexContent,
+        latex_content: latexContent.value,
         subject: selectedSubject.value,
         image_url: question.value.imageUrl,
         auth_token: store.auth_token
@@ -118,10 +117,14 @@ export default {
     };
 
     const renderLatex = () => {
-      latexPreview.value = DOMPurify.sanitize(`$$${latexContent.value}$$`);
+      const isAlreadyWrapped = latexContent.value.trim().startsWith('$$');
+      const contentToRender = isAlreadyWrapped ? latexContent.value : `$$${latexContent.value}$$`;
+      latexPreview.value = DOMPurify.sanitize(contentToRender);
       nextTick(() => {
         if (window.MathJax) {
-          window.MathJax.typesetPromise().catch(err => console.error('MathJax typesetPromise failed:', err));
+          window.MathJax.typesetPromise()
+              .then(() => console.log('LaTeX rendered successfully.'))
+              .catch(err => console.error('MathJax typesetPromise failed:', err));
         }
       });
     };

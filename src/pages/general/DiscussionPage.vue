@@ -94,13 +94,12 @@ export default {
             showPreview.value = true;
           }
           nextTick(() => {
-            if (question.value.latexContent) {
-              // Ensure MathJax is loaded and then render the latexContent
-              ensureMathJax(() => {
-                const sanitizedContent = DOMPurify.sanitize(question.value.latexContent);
-                // Assuming you have a method or ref to where you want to display the latexContent
-                displayLatexContent(sanitizedContent);
-              });
+            const latexDiv = document.querySelector('.latex-content');
+            if (latexDiv && question.value.latexContent) {
+              const isAlreadyWrapped = question.value.latexContent.trim().startsWith('$$');
+              const contentToRender = isAlreadyWrapped ? question.value.latexContent : `$$${question.value.latexContent.trim()}$$`;
+              latexDiv.innerHTML = DOMPurify.sanitize(contentToRender);
+              window.MathJax.typesetPromise([latexDiv]);
             }
           });
         })
