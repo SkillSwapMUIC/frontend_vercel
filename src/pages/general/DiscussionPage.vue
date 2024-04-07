@@ -39,7 +39,7 @@
         <button v-if="answer.allowed_to_edit" @click="editAnswer(answer.id)">Edit</button>
       </div>
     </div>
-    <EditAnswerModal v-if="showEditModal" :initialContent="editedAnswer.content" @edit="saveEdit" @cancel="cancelEdit" />
+    <!-- <EditAnswerModal v-if="showEditModal" :initialContent="editedAnswer.content" @edit="saveEdit" @cancel="cancelEdit" /> -->
 
   </div>
 </template>
@@ -148,9 +148,8 @@ export default {
         errorMessage.value = 'Authentication token not found.';
         return;
       }
-
       loading.value = true;
-      axios.post(routes("delete_answer") + "/" + answerId, { auth_token: authToken })
+      axios.post(`/delete/${answerId}`, { auth_token: authToken })
         .then(response => {
           if (response.status === 200) {
             fetchQuestionDetails(); 
@@ -166,11 +165,46 @@ export default {
           loading.value = false;
         });
     };
+    const editAnswer = (answerId) => {
+      const newContent = prompt('Enter the new content for the answer:');
+      if (!newContent) {
+         return;
+      }
+      
+      const authToken = store.auth_token;
+      if (!authToken) {
+        errorMessage.value = 'Authentication token not found.';
+        return;
+      }
+      
+      loading.value = true;
+      axios.post(`/edit_answer/${answerId}`, {
+        content: newContent,
+        auth_token: authToken
+      })
+      .then(response => {
+        if (response.status === 200) {
+          const editedAnswer = question.value.answers.find(answer => answer.id === answerId);
+          if (editedAnswer) {
+            editedAnswer.content = newContent;
+          }
+      } else {
+        errorMessage.value = 'Failed to edit answer.';
+      }
+    })
+    .catch(error => {
+      console.error('Error editing answer:', error);
+      errorMessage.value = 'Failed to edit answer.';
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 
-    const editAnswer = (answer) => {
-      editedAnswer.value = answer;
-      showEditModal.value = true;
-    };
+  };
+    // const editAnswer = (answer) => {
+    //   editedAnswer.value = answer;
+    //   showEditModal.value = true;
+    // };
 
     const saveEdit = (editedContent) => {
       const authToken = store.auth_token;
