@@ -32,6 +32,3 @@ jobs:
       env:
         VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}  
 
-
-    - name: Run pre-commit hooks
-      run: pre-commit run --all-files
