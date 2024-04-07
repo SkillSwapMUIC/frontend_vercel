@@ -52,7 +52,6 @@ import routes from "../../utils/routes_config.js";
 import StarRating from "../../pages/general/StarRating.vue";
 import {store} from "../../utils/store.js";
 import DOMPurify from 'dompurify';
-import { wrapLatexContent } from '../../utils/latexWrapper.js';
 
 export default {
   setup() {
@@ -111,27 +110,6 @@ export default {
           loading.value = false;
         });
     };
-
-    function ensureMathJax(callback) {
-      if (window.MathJax) {
-        callback();
-      } else {
-        // Load MathJax script dynamically
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-        document.head.appendChild(script);
-        script.onload = () => callback();
-      }
-    }
-
-    // Method to display LaTeX content using MathJax
-    function displayLatexContent(content) {
-      const latexDiv = document.createElement('div');
-      latexDiv.innerHTML = content;
-      document.querySelector('.latex-content').appendChild(latexDiv);
-      window.MathJax.typesetPromise([latexDiv]);
-    }
-
     onMounted(fetchQuestionDetails);
     watch(() => route.params.question_id, fetchQuestionDetails);
 
@@ -233,6 +211,7 @@ export default {
       loading,
       errorMessage,
       showPreview,
+      submitAnswer,
       deleteAnswer,
       editAnswer,
       showEditModal, 

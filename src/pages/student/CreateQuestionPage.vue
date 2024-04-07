@@ -15,10 +15,7 @@
 
       <div v-if="showLatexEditor" class="latex-editor">
         <textarea v-model="latexContent" class="latex-textarea" placeholder="Enter LaTeX content here..."></textarea>
-<!--        <div class="latex-preview" v-html="latexPreview"></div>-->
-        <div class="latex-preview">
-          {{latexPreview}}
-        </div>
+        <div class="latex-preview"></div>
       </div>
 
       <div class="image-url-field">
@@ -43,8 +40,6 @@ import {useRoute, useRouter} from 'vue-router';
 import axios from 'axios'
 import routes from "../../utils/routes_config.js";
 import {store} from "../../utils/store.js";
-import DOMPurify from 'dompurify';
-import { wrapLatexContent } from '../../utils/latexWrapper.js';
 
 export default {
   setup() {
@@ -56,7 +51,7 @@ export default {
     const isLoading = ref(false);
     const errorMessage = ref('');
     const showLatexEditor = ref(false);
-    const latexContent = ref('');
+    const latexContent = ref('\\begin{equation}\n\n\\end{equation}');
     const latexPreview = ref('');
     const question = ref({
       title: '',
@@ -117,33 +112,42 @@ export default {
     };
 
     const renderLatex = () => {
-      const isAlreadyWrapped = latexContent.value.trim().startsWith('$$');
-      const contentToRender = isAlreadyWrapped ? latexContent.value : `$$${latexContent.value}$$`;
-      latexPreview.value = DOMPurify.sanitize(contentToRender);
       nextTick(() => {
         if (window.MathJax) {
           window.MathJax.typesetPromise()
               .then(() => console.log('LaTeX rendered successfully.'))
-              .catch(err => console.error('MathJax typesetPromise failed:', err));
+              .catch(err => console.error('MathJax rendering error:', err));
         }
       });
     };
 
     watch(latexContent, renderLatex);
 
+    const updateLatexPreview = () => {
+      nextTick(() => {
+        const previewElement = document.querySelector('.latex-preview');
+        if (previewElement) {
+          previewElement.textContent = latexContent.value;
+        }
+        if (window.MathJax) {
+          window.MathJax.typesetPromise().catch(err => console.error('MathJax rendering error:', err));
+        }
+      });
+    };
+
+    watch(latexContent, updateLatexPreview, { immediate: true });
+
     onMounted(() => {
-      if (window.MathJax) {
-        window.MathJax.typesetPromise();
-      } else {
+      if (!window.MathJax) {
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
         script.async = true;
         document.head.appendChild(script);
-        script.onload = () => {
-          window.MathJax.typesetPromise();
-        };
+        script.onload = () => updateLatexPreview();
       }
     });
+
+    watch(latexContent, renderLatex, { immediate: true });
 
     return {
       subjects,
